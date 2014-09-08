@@ -7,9 +7,8 @@ module.exports = function(grunt) {
     concat: {
       bundle: {
           src: ['js/jquery/jquery.js', 
-				'js/flipclock/flipclock.min.js', 
-				'bower_components/momentjs/moment.js',
 				'bower_components/underscore/underscore.js',
+				'bower_components/jquery/dist/jquery.js',
 				'js/highcharts/highcharts.js', 
 				'js/shannon.js'],
           dest: 'bundle.js',

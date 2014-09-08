@@ -8,9 +8,30 @@
   <script src="bundle.js"></script>
   <script>
   $().ready(function(){
-    var c = document.getElementById("sandbox"),  ctx = c.getContext("2d"),  p = new Proc(ctx);
-    p.buildIt(ctx);
+    var c = document.getElementById("sandbox"),  ctx = c.getContext("2d"); //,  p = new Proc(ctx);    p.buildIt(ctx);
+
+    var pw = new Worker('js/shannon.js');
+    pw.onmessage = function( ev ) {
+//      console.log("index ev " + JSON.stringify(ev.data, null,2));
+
+      var proc = new Proc();
+      var data = JSON.parse(ev.data);
+      data.forEach(function( item ) {
+        var block = proc.fillblock(ctx, 
+                                   item.rgba.r,
+                                   item.rgba.g,
+                                   item.rgba.b,
+                                   item.rgba.a);
+
+        ctx.putImageData(block, item.x, item.y);
+      });
+    }
+
+    pw.postMessage({ "block": { "width":8, "height":8}});
+
   });
+
+
   </script>
   <canvas id="sandbox" width="940" height="940"></canvas>
 </body>

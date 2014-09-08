@@ -115,31 +115,39 @@ var Proc = function(  ) {
     } else { 
      raw = r;
      var i = 0;
+	 var re = /[\x20-\x7E]/;
+   var blocks = [];
+
+
      for( i = 0; i < raw.length; i++ ) {
+      if ( blocks.length >= 2000 ) {
+        console.log("postMessage with blocks.length : " + blocks.length)
+        postMessage(JSON.stringify(blocks));
+        blocks = [];
+        console.log("blocks.length " + blocks.length);
+      }
+      var y = Math.floor(i * ctx.block.width / 1024);
       if ( raw[i] === 0xff ) {
-       var block = that.fillblock(ctx, 255, 0, 0, 255);
-       var y = Math.floor(i * block.width / 1024);
-       ctx.putImageData(block, (i * block.width) % 1024, y * block.height);
-      } else if ( raw[i] === 0x0 ) {
-
-       var block = that.fillblock(ctx, 0, 255, 0, 255);
-       var y = Math.floor(i * block.width / 1024);
-       ctx.putImageData(block, (i * block.width) % 1024, y * block.height);
-
+         blocks.push({ "rgba": { "r":255, "g":0, "b":0 , "a":255 },
+                     "x":(i * ctx.block.width) %1024,
+                     "y":(y * ctx.block.height) });
+       } else if ( raw[i] === 0x0 ) {
+       blocks.push({ "rgba": { "r":0, "g":255, "b":0 , "a":255 },
+                   "x":(i * ctx.block.width) %1024,
+                   "y":(y * ctx.block.height) });
       } else if (  re.test(raw[i]) ) {
-
-       var block = that.fillblock(ctx, 0, 0, 255, 255);
-       var y = Math.floor(i * block.width / 1024);
-       ctx.putImageData(block, (i * block.width) % 1024, y * block.height);
-
+       blocks.push({ "rgba": { "r":255, "g":255, "b":255 , "a":0 },
+                   "x":(i * ctx.block.width) %1024,
+                   "y":(y * ctx.block.height) });
       } else {
-
-       var block = that.fillblock(ctx, 255, 255, 255, 255);
-       var y = Math.floor(i * block.width / 1024);
-       ctx.putImageData(block, (i * block.width) % 1024, y * block.height);
+       // console.log("else");
+       blocks.push({ "rgba": { "r":0, "g":0, "b":0 , "a":0 },
+                   "x":(i * ctx.block.width) %1024,
+                   "y":(y * ctx.block.height) });
       }
      }
     }
+
    });
   }
  };
@@ -147,5 +155,9 @@ var Proc = function(  ) {
  return fns;
 };
 
-
+onmessage = function( oev ) { 
+ // console.log("Shannon worker onmessage handler : BLOCK "+ JSON.stringify(oev.data));
+  var p = new Proc();
+  p.buildIt(oev.data);
+ };
 
