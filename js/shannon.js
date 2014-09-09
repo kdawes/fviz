@@ -1,6 +1,7 @@
 var Proc = function(  ) {
  var bytes = {};
  var raw;
+ var blocks = [];
 
  function getBytes(cb) {
   console.log("getBytes");
@@ -86,32 +87,20 @@ var Proc = function(  ) {
     count ++;
    } while ( left > 0);
   },
-  fillblock: function(context, r,g,b,a) { 
-   if ( undefined === context ) {
+
+  buildIt: function(ctx, cb) {
+   var that = this;
+   console.log('buildIt  ' + JSON.stringify(ctx));
+   
+   if ( ctx == null ) {
+    console.log("Null context - returning");
     return;
    }
-   var red = r || 0;
-   var green   = g || 0;
-   var blue  = b || 0;
-   var alpha = a || 255;
 
-   var block = context.createImageData(8,8);
-   //magic 4 because rgba - one byte for each
-   for (x = 0; x < block.width * block.height * 4; x+= 4) {
-    block.data[x]  = red;
-    block.data[x+1]= green;
-    block.data[x+2]= blue;
-    block.data[x+3]= alpha;
-   }
-
-   return block;
-  },
-  buildIt: function(ctx) {
-   var that = this;
-   console.log('buildIt')
    getBytes(function(e,r) {
     if ( e != null ) {
      console.log("ERROR " + e);
+     return cb(e, null);
     } else { 
      raw = r;
      var i = 0;
@@ -120,12 +109,6 @@ var Proc = function(  ) {
 
 
      for( i = 0; i < raw.length; i++ ) {
-      if ( blocks.length >= 2000 ) {
-        console.log("postMessage with blocks.length : " + blocks.length)
-        postMessage(JSON.stringify(blocks));
-        blocks = [];
-        console.log("blocks.length " + blocks.length);
-      }
       var y = Math.floor(i * ctx.block.width / 1024);
       if ( raw[i] === 0xff ) {
          blocks.push({ "rgba": { "r":255, "g":0, "b":0 , "a":255 },
@@ -147,7 +130,7 @@ var Proc = function(  ) {
       }
      }
     }
-
+    return cb(null, blocks);
    });
   }
  };
@@ -156,8 +139,25 @@ var Proc = function(  ) {
 };
 
 onmessage = function( oev ) { 
- // console.log("Shannon worker onmessage handler : BLOCK "+ JSON.stringify(oev.data));
-  var p = new Proc();
-  p.buildIt(oev.data);
- };
+  var LIMIT_DATA = 16384;
+
+  if ( oev.data ) {
+   console.log("Shannon worker onmessage handler : BLOCK "+ JSON.stringify(oev.data));
+   var p = new Proc();
+   p.buildIt(oev.data, function( e, r ) {
+    if ( e ) {  console.log ("ERROR " +  e); }
+    console.log("Got blocks : " + r.length);
+    var results = r;
+    setInterval(function() {
+      if ( results.length >= LIMIT_DATA ) {
+        console.log("postMessage with blocks.length : " + results.length)
+        postMessage(JSON.stringify(results.splice(0, LIMIT_DATA)));
+        console.log("blocks.length " + results.length);
+      }
+
+    }, 500);
+  });
+ }
+};
+
 

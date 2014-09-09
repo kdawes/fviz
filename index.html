@@ -9,30 +9,68 @@
   <script>
   $().ready(function(){
     var c = document.getElementById("sandbox"),  ctx = c.getContext("2d"); //,  p = new Proc(ctx);    p.buildIt(ctx);
+    var blocks = [];
+
+    setInterval(function() {
+      requestAnimationFrame(render);
+    }, 750);
+
+    var fillblock = function(context, r,g,b,a) { 
+      if ( undefined === context ) {
+        return;
+      }
+      var red = r || 0;
+      var green   = g || 0;
+      var blue  = b || 0;
+      var alpha = a || 255;
+
+      var block = context.createImageData(8,8);
+      //magic 4 because rgba - one byte for each
+      for (x = 0; x < block.width * block.height * 4 ; x+= 4) {
+        block.data[x]  = red;
+        block.data[x+1]= green;
+        block.data[x+2]= blue;
+        block.data[x+3]= alpha;
+      }
+      return block;
+    };
 
     var pw = new Worker('js/shannon.js');
     pw.onmessage = function( ev ) {
-//      console.log("index ev " + JSON.stringify(ev.data, null,2));
+      var data;
+      try { 
+        data = JSON.parse(ev.data);
+      } catch ( e ) { 
+        console.log("onmessage : ERROR parsing input" + JSON.stringify(e));
+      }
 
-      var proc = new Proc();
-      var data = JSON.parse(ev.data);
-      data.forEach(function( item ) {
-        var block = proc.fillblock(ctx, 
-                                   item.rgba.r,
-                                   item.rgba.g,
-                                   item.rgba.b,
-                                   item.rgba.a);
+      if ( data.length && data.length > 0) {
+        //console.log("index ev.data has  " + data.length);
+        data.forEach(function( item ) {
+          var block = fillblock(ctx, 
+                              item.rgba.r,
+                              item.rgba.g,
+                              item.rgba.b,
+                              item.rgba.a);
+          blocks.push({"block":block, "item":item});
+        });
+      } 
+    }; 
 
-        ctx.putImageData(block, item.x, item.y);
-      });
+
+    function render() {
+      console.log("RENDER: " + blocks.length );
+      var LIMIT_DATA = 16384;
+      var limited = blocks.splice(0, LIMIT_DATA);
+      limited.forEach(function(block) {
+        ctx.putImageData(block.block, block.item.x, block.item.y);
+      })
     }
 
     pw.postMessage({ "block": { "width":8, "height":8}});
-
   });
-
-
   </script>
-  <canvas id="sandbox" width="940" height="940"></canvas>
+
+  <canvas id="sandbox" width="2048" height="16384"></canvas>
 </body>
 </html>
