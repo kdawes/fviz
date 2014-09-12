@@ -10,9 +10,12 @@ var Proc = function(  ) {
   xhr.open('GET', '/test.png', true); 
   xhr.responseType = 'arraybuffer';
   xhr.onload = function(e) {
-   var words = new Uint8Array(this.response);
+    console.log("XHR load");
+    var words = new Uint8Array(this.response);
+   console.log("WE GOT " + words.length );
    cb(null, words);
   };
+  console.log("XHR SEND");
   xhr.send();
  }
 
@@ -105,14 +108,11 @@ var Proc = function(  ) {
      raw = r;
      var i = 0;
 	 var re = /[\x20-\x7E]/;
-   var blocks = [];
-
-
      for( i = 0; i < raw.length; i++ ) {
       var y = Math.floor(i * ctx.block.width / 1024);
       if ( raw[i] === 0xff ) {
          blocks.push({ "rgba": { "r":255, "g":0, "b":0 , "a":255 },
-                     "x":(i * ctx.block.width) %1024,
+                     "x":(i * ctx.block.width) % 1024,
                      "y":(y * ctx.block.height) });
        } else if ( raw[i] === 0x0 ) {
        blocks.push({ "rgba": { "r":0, "g":255, "b":0 , "a":255 },
@@ -137,24 +137,24 @@ var Proc = function(  ) {
 
  return fns;
 };
-
+// Onmessage for webworker support
 onmessage = function( oev ) { 
   var LIMIT_DATA = 16384;
 
   if ( oev.data ) {
+    console.log("TYPEOF " + oev.data);
    console.log("Shannon worker onmessage handler : BLOCK "+ JSON.stringify(oev.data));
    var p = new Proc();
    p.buildIt(oev.data, function( e, r ) {
-    if ( e ) {  console.log ("ERROR " +  e); }
-    console.log("Got blocks : " + r.length);
-    var results = r;
-    setInterval(function() {
-      if ( results.length >= LIMIT_DATA ) {
-        console.log("postMessage with blocks.length : " + results.length)
-        postMessage(JSON.stringify(results.splice(0, LIMIT_DATA)));
-        console.log("blocks.length " + results.length);
-      }
-
+    if ( e ) {  console.log ("ERROR " +  e); return; }
+    console.log("Got bytes : " + r.length);
+    var intervalId = setInterval(function() {
+      console.log("1234 postMessage with bytes.length : " + r.length)
+      postMessage(JSON.stringify(r.splice(0, LIMIT_DATA)));
+         //console.log("bytes.length " + results.length);
+        if ( r.length === 0 ) {
+          clearInterval(intervalId);
+        }
     }, 500);
   });
  }

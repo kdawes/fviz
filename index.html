@@ -5,15 +5,63 @@
 <!--  <link rel="stylesheet" href="css/filenamehere :) "> -->
 </head>
 <body>
+  <div id='messages'></div>
   <script src="bundle.js"></script>
   <script>
   $().ready(function(){
-    var c = document.getElementById("sandbox"),  ctx = c.getContext("2d"); //,  p = new Proc(ctx);    p.buildIt(ctx);
-    var blocks = [];
+    $("#messages").html("<h3>Loading...</h3>");
+console.log("WTF WTF");
+    var tester = document.createElement("canvas"),  ctx = tester.getContext("2d"); 
 
-    setInterval(function() {
-      requestAnimationFrame(render);
-    }, 750);
+    var LIMIT_DATA = 128000;
+    var last = 0;
+    var blocks = [];
+    var renderedList = [];
+    var state = setupState();
+
+
+    function setupAnimInterval(interval) {
+      return setInterval(function() {
+        requestAnimationFrame(render);
+      }, interval || 750);
+    }
+
+    function setupState() {
+      var state = {
+        animFnId : null,
+        animInterval : 750,
+        idleCount : 0,
+        rendered : 0,
+        worker : null
+      };
+
+      state.animFnId = setupAnimInterval();
+      state.worker  = new Worker('js/shannon.js');    
+      state.worker.onmessage = function( ev ) {
+        console.log("ONMESSAGE WORKER " + ev.data.length);
+        var data;
+        try { 
+          data = JSON.parse(ev.data);
+        } catch ( e ) { 
+          console.log("onmessage : ERROR parsing input" + JSON.stringify(e));
+        }
+
+        if ( data.length && data.length > 0) {
+          console.log("index ev.data length  " + data.length);
+          data.forEach(function( item ) {
+            var block = fillblock(ctx, 
+                                  item.rgba.r,
+                                  item.rgba.g,
+                                  item.rgba.b,
+                                  item.rgba.a);
+            blocks.push({"block":block, "item":item});
+          });
+        } else { 
+          console.log("WTF WTF WTF WTF ? ");
+        }
+      }; 
+      return state;
+    }
 
     var fillblock = function(context, r,g,b,a) { 
       if ( undefined === context ) {
@@ -35,42 +83,91 @@
       return block;
     };
 
-    var pw = new Worker('js/shannon.js');
-    pw.onmessage = function( ev ) {
-      var data;
-      try { 
-        data = JSON.parse(ev.data);
-      } catch ( e ) { 
-        console.log("onmessage : ERROR parsing input" + JSON.stringify(e));
+    function shutdown( opts ) {
+      console.log("SHUTDOWN"); 
+      if ( opts.animFnId ) {
+        clearInterval(opts.animFnId);
+        opts.animFnId = null;
+        opts.worker.terminate();
+        blocks = [];
+        rendered = [];
       }
-
-      if ( data.length && data.length > 0) {
-        //console.log("index ev.data has  " + data.length);
-        data.forEach(function( item ) {
-          var block = fillblock(ctx, 
-                              item.rgba.r,
-                              item.rgba.g,
-                              item.rgba.b,
-                              item.rgba.a);
-          blocks.push({"block":block, "item":item});
-        });
-      } 
-    }; 
-
-
-    function render() {
-      console.log("RENDER: " + blocks.length );
-      var LIMIT_DATA = 16384;
-      var limited = blocks.splice(0, LIMIT_DATA);
-      limited.forEach(function(block) {
-        ctx.putImageData(block.block, block.item.x, block.item.y);
-      })
     }
 
-    pw.postMessage({ "block": { "width":8, "height":8}});
+    function reRender(inputList) {
+          $("#messages").html("<h3><b>RENDERING</b></h3>");
+      console.log("reRender with sa" + JSON.stringify(state));
+      if ( state.animFnId ) { 
+        console.log("in ... with rendered = " + inputList.length);
+    var c = document.getElementById("sandbox"),  ctx2 = c.getContext("2d"); 
+    ctx.canvas.width = 2048;
+    ctx.canvas.height = 4096;
+
+        clearInterval(state.animFnId);
+        state.animFnId = null;
+        var cloned = _.clone(inputList);
+        function lclWorker() {
+          console.log("lclworker " + cloned.length);
+          cloned.splice(0, LIMIT_DATA).forEach(function(block) {
+            ctx2.putImageData(block.block, block.item.x, block.item.y);
+          //console.log("->" + block.item.x + "," + block.item.y);
+          });
+          if ( cloned.length === 0 ) { 
+            ctx2.drawImage(tester, 1024, 4096);
+            clearInterval(tmpId);
+            state.animFnId = setupAnimInterval();
+          }
+        }
+        var tmpId = setInterval(function() {
+          lclWorker();
+
+        }, 500);
+        
+      }
+    }
+
+    function render() {
+      console.log("render...");
+      if ( last === state.rendered ) {
+        state.idleCount++;
+      }
+
+      if ( state.idleCount > 8 && state.rendered > 0) { 
+        reRender(renderedList);
+        shutdown(state);
+      }
+
+      if ( state.animFnId ) {
+        console.log("RENDER: " + blocks.length );
+        last = state.rendered;
+        //console.log("Idle Count " + state.idleCount + " Rendered " + state.rendered + " canvas : (w : " + ctx.canvas.width + ", h" + ctx.canvas.height +") > " + (state.rendered / 2048 * 8));
+
+
+        var limited = blocks.splice(0, LIMIT_DATA);
+        limited.forEach(function(block) {
+          state.idleCount = 0;
+          state.rendered ++;
+          //ctx.putImageData(block.block, block.item.x, block.item.y);
+          renderedList.push(block);
+        })
+ 
+        // if ( state.rendered / 2048 * 8 > ctx.canvas.height ) { 
+        //   console.log("RESIZING CANVAS to " + ctx.canvas + 4000 );
+        //   ctx.canvas.height = ctx.canvas.height + 4000;
+        //   reRender(renderedList);
+        // }
+      }
+    }
+
+    state.worker.postMessage({ "block": { "width":2, "height":2}});
+    var p = new Periodic({ "cb":function(e,r) { console.log("cb!" + JSON.stringify(r) ) } });
+    p.start();
+    p.stop();
+
   });
   </script>
 
-  <canvas id="sandbox" width="2048" height="16384"></canvas>
+  <canvas id="sandbox" width="1024" height="4096"></canvas>
 </body>
 </html>
+ 

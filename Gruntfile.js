@@ -6,12 +6,12 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       bundle: {
-          src: ['js/jquery/jquery.js', 
-				'bower_components/underscore/underscore.js',
+          src: ['bower_components/lodash/dist/lodash.js',
 				'bower_components/jquery/dist/jquery.js',
 				'js/highcharts/highcharts.js', 
-				'js/shannon.js'],
-          dest: 'bundle.js',
+				'js/shannon.js',
+        'js/Periodic.js'],
+        dest: 'bundle.js',
       },
     },
    });
