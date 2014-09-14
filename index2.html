@@ -1,0 +1,36 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+<!--  <link rel="stylesheet" href="css/filenamehere :) "> -->
+</head>
+<body>
+  <div id='messages'></div>
+  <script src="bundle.js"></script>
+  <script src="js/browserifybundle.js"></script>
+  <script>
+    $(document).ready(function() {
+      var opts = { 
+        "interval":500, 
+        "count":32, 
+        "cb" : function(e,r) { 
+          console.log("cb!" + JSON.stringify(r)); 
+          $('#messages').html(JSON.stringify(r)); 
+        },
+      }
+      var Periodic = require('Periodic');
+      var p = new Periodic(opts);
+
+      var Runner = require('Runner');
+      var r = new Runner();
+      r.add(p);
+      r.start(p.id());
+      //r.stop(r.id());
+
+      $('#messages').html("<h1>test Runner</h1>");
+    });
+  </script>
+   <canvas id="sandbox" width="1024" height="4096"></canvas>
+</body>
+</html>
+ 

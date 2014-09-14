@@ -7,10 +7,13 @@
 <body>
   <div id='messages'></div>
   <script src="bundle.js"></script>
+  <script src="js/browserifybundle.js"></script>
   <script>
   $().ready(function(){
     $("#messages").html("<h3>Loading...</h3>");
-console.log("WTF WTF");
+    var Periodic = require("Periodic");
+
+    //var runner = new Runner({ "abcd":"efgh" });
     var tester = document.createElement("canvas"),  ctx = tester.getContext("2d"); 
 
     var LIMIT_DATA = 128000;
@@ -160,9 +163,10 @@ console.log("WTF WTF");
     }
 
     state.worker.postMessage({ "block": { "width":2, "height":2}});
-    var p = new Periodic({ "cb":function(e,r) { console.log("cb!" + JSON.stringify(r) ) } });
+    var p = new Periodic({ "count":4, "cb":function(e,r) { console.log("cb!" + JSON.stringify(r) ) } });
     p.start();
-    p.stop();
+//    p.stop();
+  var Runner = require('./Runner');
 
   });
   </script>

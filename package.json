@@ -5,6 +5,7 @@
   "main": "bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "browserify -r ./js/Periodic:Periodic -r ./js/Runner:Runner > js/browserifybundle.js && grunt"
   },
   "repository": "",
   "author": "",
