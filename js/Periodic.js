@@ -35,6 +35,7 @@ var Periodic = function( opts ) {
         start : function() {
             console.log("start " + state.id + " execCOUNT " + state.execCount + " args.count " + args.count);
             if ( state.cb ) {
+                console.log("start - getting to setInterval");
                 state.id = setInterval(function() {
                     //user specifies a count - drop out if we hit it
                     if ( args.count > 0 && state.execCount >= args.count ) {
@@ -53,6 +54,9 @@ var Periodic = function( opts ) {
         },
         id: function() {
             return state.id;
+        },
+        isPeriodic : function() {
+            return true;
         }
     };
 

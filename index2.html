@@ -19,13 +19,14 @@
         },
       }
       var Periodic = require('Periodic');
+      console.log("Required periodic - instanceOf ? " + (Periodic instanceof Periodic));
       var p = new Periodic(opts);
-
+      console.log("new Periodic() instanceof ? "+ ( p instanceof Periodic));
       var Runner = require('Runner');
       var r = new Runner();
       r.add(p);
-      r.start(p.id());
-      //r.stop(r.id());
+      r.startall();
+      r.stop(p.id());
 
       $('#messages').html("<h1>test Runner</h1>");
     });
