@@ -139,7 +139,7 @@ var Proc = function(  ) {
 };
 // Onmessage for webworker support
 onmessage = function( oev ) { 
-  var LIMIT_DATA = 16384;
+  var LIMIT_DATA = 1000000;
 
   if ( oev.data ) {
     console.log("TYPEOF " + oev.data);
@@ -153,7 +153,9 @@ onmessage = function( oev ) {
       postMessage(JSON.stringify(r.splice(0, LIMIT_DATA)));
          //console.log("bytes.length " + results.length);
         if ( r.length === 0 ) {
+          console.log("CLEARING webworker interval - data is done");
           clearInterval(intervalId);
+          postMessage(null);
         }
     }, 500);
   });

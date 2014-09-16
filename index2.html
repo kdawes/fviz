@@ -10,25 +10,30 @@
   <script src="js/browserifybundle.js"></script>
   <script>
     $(document).ready(function() {
-      var opts = { 
-        "interval":500, 
-        "count":32, 
-        "cb" : function(e,r) { 
-          console.log("cb!" + JSON.stringify(r)); 
-          $('#messages').html(JSON.stringify(r)); 
-        },
-      }
-      var Periodic = require('Periodic');
-      console.log("Required periodic - instanceOf ? " + (Periodic instanceof Periodic));
-      var p = new Periodic(opts);
-      console.log("new Periodic() instanceof ? "+ ( p instanceof Periodic));
-      var Runner = require('Runner');
-      var r = new Runner();
-      r.add(p);
-      r.startall();
-      r.stop(p.id());
+      // var opts = { 
+      //   "interval":500, 
+      //   "count":32, 
+      //   "cb" : function(e,r) { 
+      //     console.log("cb!" + JSON.stringify(r)); 
+      //     $('#messages').html(JSON.stringify(r)); 
+      //   },
+      // }
+      // var Periodic = require('Periodic');
+      // console.log("Required periodic - instanceOf ? " + (Periodic instanceof Periodic));
+      // var p = new Periodic(opts);
+      // console.log("new Periodic() instanceof ? "+ ( p instanceof Periodic));
+      // var Runner = require('Runner');
+      // var r = new Runner();
+      // r.add(p);
+      // r.startall();
 
+      var Utils = require('Utils');
+      var engine = new Utils();
+      
       $('#messages').html("<h1>test Runner</h1>");
+
+      engine.go({"width":4, "height":4});
+  
     });
   </script>
    <canvas id="sandbox" width="1024" height="4096"></canvas>

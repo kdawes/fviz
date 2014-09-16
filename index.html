@@ -11,10 +11,9 @@
   <script>
   $().ready(function(){
     $("#messages").html("<h3>Loading...</h3>");
-    var Periodic = require("Periodic");
 
-    //var runner = new Runner({ "abcd":"efgh" });
-    var tester = document.createElement("canvas"),  ctx = tester.getContext("2d"); 
+    var tester = document.createElement("canvas"),  
+    ctx = tester.getContext("2d"); 
 
     var LIMIT_DATA = 128000;
     var last = 0;
@@ -103,7 +102,7 @@
       if ( state.animFnId ) { 
         console.log("in ... with rendered = " + inputList.length);
     var c = document.getElementById("sandbox"),  ctx2 = c.getContext("2d"); 
-    ctx.canvas.width = 2048;
+    ctx.canvas.width = 1024;
     ctx.canvas.height = 4096;
 
         clearInterval(state.animFnId);
