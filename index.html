@@ -102,22 +102,22 @@
       if ( state.animFnId ) { 
         console.log("in ... with rendered = " + inputList.length);
     var c = document.getElementById("sandbox"),  ctx2 = c.getContext("2d"); 
-    ctx.canvas.width = 1024;
+    ctx.canvas.width = 2048;
     ctx.canvas.height = 4096;
 
         clearInterval(state.animFnId);
         state.animFnId = null;
         var cloned = _.clone(inputList);
         function lclWorker() {
+
           console.log("lclworker " + cloned.length);
           cloned.splice(0, LIMIT_DATA).forEach(function(block) {
             ctx2.putImageData(block.block, block.item.x, block.item.y);
           //console.log("->" + block.item.x + "," + block.item.y);
           });
           if ( cloned.length === 0 ) { 
-            ctx2.drawImage(tester, 1024, 4096);
+            ctx2.drawImage(tester, 2048, 4096);
             clearInterval(tmpId);
-            state.animFnId = setupAnimInterval();
           }
         }
         var tmpId = setInterval(function() {

@@ -38,7 +38,7 @@ var Utils = function() {
     var tester = document.createElement("canvas"),  
     ctx = tester.getContext("2d"); 
     var c = document.getElementById("sandbox"),  ctx2 = c.getContext("2d"); 
-    ctx2.canvas.width = 1024;
+    ctx2.canvas.width = 2048;
     ctx2.canvas.height = 4096;
     state.blocks.forEach(function(block) {
       var imgdata = fillblock(ctx, 
@@ -51,7 +51,7 @@ var Utils = function() {
        // console.log("->" + JSON.stringify(block));//block.item.x + "," + block.item.y);
     });
     console.log("drawing to sandbox");
-    ctx.drawImage(tester, 1024, 4096);
+    ctx.drawImage(tester, 2048, 4096);
   }
 
   var fns = {
@@ -62,6 +62,9 @@ var Utils = function() {
       renderCallback();
     },
     setupEngine: function() {
+      var workerstream = require('./index')
+      var worker = workerstream('demo-worker.js')
+
       state.worker  = new Worker('js/shannon.js');    
       state.worker.onmessage = function( ev ) {
         console.log("ONMESSAGE WORKER ");
