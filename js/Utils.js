@@ -7,51 +7,48 @@ var Utils = function() {
         rendered : 0,
         worker : null,
         blocks : [],
-        renderedList : []
+        renderedList : [],
+        w:0,
+        h:0
       };
       
 
 
-  var fillblock = function(context, r,g,b,a) { 
+  var fillblock = function(context, w, h, blk ) {
     if ( undefined === context ) {
       return;
     }
-    var red = r || 0;
-    var green   = g || 0;
-    var blue  = b || 0;
-    var alpha = a || 255;
-
-    var block = context.createImageData(8,8);
+    var b = context.createImageData(w,h);
     //magic 4 because rgba - one byte for each
-    for (x = 0; x < block.width * block.height * 4 ; x+= 4) {
-      block.data[x]  = red;
-      block.data[x+1]= green;
-      block.data[x+2]= blue;
-      block.data[x+3]= alpha;
+    for (x = 0; x < b.data.length ; x+= 4) {
+      b.data[x+0]  = blk.rgba.r;//(blk.rgba.r) ? blk.raw : 0;
+      b.data[x+1]  = blk.rgba.g;//(blk.rgba.g ) ? blk.raw : 0;
+      b.data[x+2]  = blk.rgba.b;//(blk.rgba.b ) ? blk.raw : 0;
+      b.data[x+3]  = blk.rgba.a;
     }
-    return block;
+//    console.log("fillblk : block" + JSON.stringify(block));
+    return b;
   };
 
   function render() {
-    console.log("render..." + state.blocks.length );
+    console.log("render..." + state.blocks.length  + " " + state.w +  "  " + state.h );
     $("#messages").html("<h3><b>RENDERING</b></h3>");
     var tester = document.createElement("canvas"),  
     ctx = tester.getContext("2d"); 
     var c = document.getElementById("sandbox"),  ctx2 = c.getContext("2d"); 
-    ctx2.canvas.width = 2048;
-    ctx2.canvas.height = 4096;
+    ctx2.canvas.width =  state.w;
+    ctx2.canvas.height = state.h;
+    console.log("BLOCK[0] " + JSON.stringify(state.blocks[0]));
     state.blocks.forEach(function(block) {
-      var imgdata = fillblock(ctx, 
-                       block.block, 
-                       block.rgba.r, 
-                       block.rgba.g, 
-                       block.rgba.b, 
-                       block.rgba.a);
+//      console.log(">> block " + JSON.stringify(block));
+      var imgdata = fillblock(ctx, 3, 3,  block );
+
+      //console.log("imgdata " + JSON.stringify(imgdata));
       ctx2.putImageData(imgdata, block.x, block.y);
        // console.log("->" + JSON.stringify(block));//block.item.x + "," + block.item.y);
     });
     console.log("drawing to sandbox");
-    ctx.drawImage(tester, 2048, 4096);
+    ctx.drawImage(tester, state.w, state.h);
   }
 
   var fns = {
@@ -62,9 +59,6 @@ var Utils = function() {
       renderCallback();
     },
     setupEngine: function() {
-      var workerstream = require('./index')
-      var worker = workerstream('demo-worker.js')
-
       state.worker  = new Worker('js/shannon.js');    
       state.worker.onmessage = function( ev ) {
         console.log("ONMESSAGE WORKER ");
@@ -96,7 +90,9 @@ var Utils = function() {
     go: function(opts) {
       var width = opts.width || 2;
       var height = opts.height || 2;
-      state.worker.postMessage({ "block": { "width":width, "height":height}});
+      state.w = opts.spanw;
+      state.h = opts.spanh
+      state.worker.postMessage({ "spanw":opts.spanw, "spanh":opts.spanh, "block": { "width":width, "height":height}});
     }
   };
 

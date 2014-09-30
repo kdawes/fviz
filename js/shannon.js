@@ -109,24 +109,30 @@ var Proc = function(  ) {
      var i = 0;
 	 var re = /[\x20-\x7E]/;
      for( i = 0; i < raw.length; i++ ) {
-      var y = Math.floor(i * ctx.block.width / 1024);
+      var y = Math.floor(i * ctx.block.width / ctx.spanw);
+      var xx = (i * ctx.block.width) % ctx.spanw;
+      var yy = (y * ctx.block.height);
+
       if ( raw[i] === 0xff ) {
-         blocks.push({ "rgba": { "r":255, "g":0, "b":0 , "a":255 },
-                     "x":(i * ctx.block.width) % 1024,
-                     "y":(y * ctx.block.height) });
+         blocks.push({ "raw": raw[i], "rgba": { "r":255, "g":0, "b":0 , "a": 255 },
+                     "x": xx,
+                     "y":yy , "width" : ctx.block.width, "height":ctx.block.height});
+        // console.log("0xff " + xx + " " + yy);
        } else if ( raw[i] === 0x0 ) {
-       blocks.push({ "rgba": { "r":0, "g":255, "b":0 , "a":255 },
-                   "x":(i * ctx.block.width) %1024,
-                   "y":(y * ctx.block.height) });
+       blocks.push({ "raw": raw[i], "rgba": { "r":0, "g":255, "b":0, "a": 255},
+                     "x": xx,
+                     "y":yy });
+     //  console.log("0x00 " + xx + " " + yy);
       } else if (  re.test(raw[i]) ) {
-       blocks.push({ "rgba": { "r":255, "g":255, "b":255 , "a":0 },
-                   "x":(i * ctx.block.width) %1024,
-                   "y":(y * ctx.block.height) });
+       blocks.push({ "raw": raw[i],"rgba": { "r":0, "g":0, "b":255 , "a":255 },
+                     "x": xx,
+                     "y":yy });
+   //    console.log("0xmatch xx: " + xx + " yy: " + yy);
       } else {
-       // console.log("else");
-       blocks.push({ "rgba": { "r":0, "g":0, "b":0 , "a":0 },
-                   "x":(i * ctx.block.width) %1024,
-                   "y":(y * ctx.block.height) });
+       blocks.push({ "raw": raw[i], "rgba": { "r":255, "g":255, "b":255, "a":255},
+                     "x": xx,
+                     "y":yy });
+       //console.log("else " + xx + " " + yy);
       }
      }
     }
