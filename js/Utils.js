@@ -1,18 +1,19 @@
 var Utils = function() {
 
   var state = {
-        animFnId : null,
-        animInterval : 750,
-        idleCount : 0,
-        rendered : 0,
-        worker : null,
-        blocks : [],
-        renderedList : [],
-        w:0,
-        h:0
-      };
-      
-
+    animInterval : 750,
+    idleCount : 0,
+    rendered : 0,
+    worker : null,
+    blocks : [],
+    renderedList : [],
+    w:0,
+    h:0,
+    bw:0,
+    bh:0,
+    grid:false,
+    engine:null
+  };
 
   var fillblock = function(context, w, h, blk ) {
     if ( undefined === context ) {
@@ -21,12 +22,12 @@ var Utils = function() {
     var b = context.createImageData(w,h);
     //magic 4 because rgba - one byte for each
     for (x = 0; x < b.data.length ; x+= 4) {
-      b.data[x+0]  = blk.rgba.r;//(blk.rgba.r) ? blk.raw : 0;
-      b.data[x+1]  = blk.rgba.g;//(blk.rgba.g ) ? blk.raw : 0;
-      b.data[x+2]  = blk.rgba.b;//(blk.rgba.b ) ? blk.raw : 0;
+      b.data[x+0]  = blk.rgba.r;
+      b.data[x+1]  = blk.rgba.g;
+      b.data[x+2]  = blk.rgba.b;
       b.data[x+3]  = blk.rgba.a;
     }
-//    console.log("fillblk : block" + JSON.stringify(block));
+
     return b;
   };
 
@@ -40,49 +41,32 @@ var Utils = function() {
     ctx2.canvas.height = state.h;
     console.log("BLOCK[0] " + JSON.stringify(state.blocks[0]));
     state.blocks.forEach(function(block) {
-//      console.log(">> block " + JSON.stringify(block));
-      var imgdata = fillblock(ctx, 3, 3,  block );
-
-      //console.log("imgdata " + JSON.stringify(imgdata));
+      var w = ( state.grid && state.bw > 2) ? state.bw - 1 : state.bw;
+      var h = ( state.grid && state.bh > 2) ? state.bh - 1 : state.bh;
+      var imgdata = fillblock(ctx, w, h,  block );
       ctx2.putImageData(imgdata, block.x, block.y);
-       // console.log("->" + JSON.stringify(block));//block.item.x + "," + block.item.y);
+
     });
     console.log("drawing to sandbox");
     ctx.drawImage(tester, state.w, state.h);
   }
 
   var fns = {
-    setupAnimInterval : function(interval, renderCallback) {
-     // return setInterval(function() {
-     //   requestAnimationFrame(renderCallback);
-     // },interval || 750)
-      renderCallback();
-    },
     setupEngine: function() {
       state.worker  = new Worker('js/shannon.js');    
       state.worker.onmessage = function( ev ) {
         console.log("ONMESSAGE WORKER ");
         if ( ev.data ) {
           console.log("ev.data.length : " + ev.data.length);
-          var data;
           try { 
-            data = JSON.parse(ev.data);
+            state.blocks = JSON.parse(ev.data);
           } catch ( e ) { 
             console.log("onmessage : ERROR parsing input" + JSON.stringify(e));
           }  
-          //If we are done receiving - start rendering
-          if ( data.length && data.length > 0) {
-            //still receiving data
-            console.log("index ev.data length  " + data.length);
-            data.forEach(function(b) {
-              state.blocks.push(b);
-            });
-          } else { 
-            console.log("worker - WTF WTF WTF WTF ? " + data);
-          }
         } else {
+          //If we are done receiving - start rendering
           console.log("Starting anim interval");
-          state.animFnId = fns.setupAnimInterval(100, render);
+          render();
         }
       }
       return state;
@@ -92,13 +76,22 @@ var Utils = function() {
       var height = opts.height || 2;
       state.w = opts.spanw;
       state.h = opts.spanh
-      state.worker.postMessage({ "spanw":opts.spanw, "spanh":opts.spanh, "block": { "width":width, "height":height}});
+      state.bw = width;
+      state.bh = height;
+      state.grid = opts.grid;
+      state.engine = opts.engine;
+      state.worker.postMessage({
+        "engine":opts.engine, 
+        "spanw":opts.spanw, 
+        "spanh":opts.spanh, 
+        "block": { "width":width, "height":height}
+      });
     }
   };
 
 
-  this.engine = fns.setupEngine();
-  var that = this;
+  fns.setupEngine();
+
   return fns;
 };
 
