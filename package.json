@@ -2,9 +2,10 @@
   "name": "git_fviz",
   "version": "0.0.0",
   "description": "",
-  "main": "bundle.js",
+  "main": "js/go.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "grunt && beefy js/go.js:js/browserifybundle.js --live -- -r ./js/Periodic:Periodic -r ./js/Runner:Runner -r ./js/Utils:Utils"
   },
   "repository": "",
   "author": "",
@@ -12,9 +13,7 @@
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.2.7",
-    "node-static": "^0.7.5",
-    "tape": "^2.14.0"
+    "grunt-contrib-uglify": "~0.2.7"
   },
   "dependencies": {
     "director": "^1.2.3"
