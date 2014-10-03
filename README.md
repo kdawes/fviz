@@ -4,5 +4,4 @@ Notes : bower components checked into git, browserify and grunt-cli in the path
 **git clone
 **npm install
 
-$ browserify -v -r ./js/Periodic:Periodic -r ./js/Runner:Runner -o js/browserifybundle.js --watch &
-$ grunt && static
+beefy js/go.js:js/browserifybundle.js --live -- -r ./js/Periodic:Periodic -r ./js/Runner:Runner -r ./js/Utils:Utils

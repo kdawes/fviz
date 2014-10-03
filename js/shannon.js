@@ -38,11 +38,12 @@ var Proc = function(  ) {
 		var blocks = [];
 		var raw = opts.data;
 		var i = 0;
-		var re = /[\x20-\x7E]/;
+		var re =  /[\x20-\x7E]/;
 		for( i = 0; i < raw.length; i++ ) {
 			var y = Math.floor(i * ctx.block.width / ctx.spanw);
 			var xx = (i * ctx.block.width) % ctx.spanw;
 			var yy = (y * ctx.block.height);
+//			if ( yy > 16384 ) { console.log("TOO BIG " + yy);}
 			if ( raw[i] === 0xff ) {
 				blocks.push({ "raw": raw[i], "rgba": { "r":255, "g":0, "b":0 , "a": 255 },
 							  "x": xx,
@@ -67,6 +68,7 @@ var Proc = function(  ) {
 	};
 
     function pluginShannon(opts){ 
+    	//console.log("pluginShanon " + JSON.stringify(opts.ctx,null,2));
         var blocks = [];
         var ctx = opts.ctx;
         var raw = opts.data;
@@ -75,7 +77,24 @@ var Proc = function(  ) {
         	var y = Math.floor(i * ctx.block.width / ctx.spanw);
 			var xx = (i * ctx.block.width) % ctx.spanw;
 			var yy = (y * ctx.block.height);
-			blocks.push({ "raw": tmp[i],"rgba": { "r":tmp[i], "g":0, "b":0 , "a":tmp[i]  },
+			blocks.push({ "raw": tmp[i],"rgba": { "r":tmp[i] * 1.095, "g":0, "b":0 , "a": tmp[i] << 1.75 },
+			            "x": xx,
+			            "y":yy });
+        }
+        return blocks;
+    }
+
+    function pluginRaw(opts){ 
+    	//console.log("pluginShanon " + JSON.stringify(opts.ctx,null,2));
+        var blocks = [];
+        var ctx = opts.ctx;
+        var raw = opts.data;
+        var c = 0;
+        for( i = 0; i < raw.length; i++, c+=4) {
+        	var y = Math.floor(i * ctx.block.width / ctx.spanw);
+			var xx = (i * ctx.block.width) % ctx.spanw;
+			var yy = (y * ctx.block.height);
+			blocks.push({ "raw": raw[i],"rgba": { "r":raw[i] , "g": raw[i], "b": raw[i] , "a": 255 },
 			            "x": xx,
 			            "y":yy });
         }
@@ -100,8 +119,9 @@ var Proc = function(  ) {
 			console.log('Shannon entropy ' +  -1 * sums);
 		},
 		chunked_shannon: function(opts) { 
+			console.log("CHUNKED SHANNON "  + JSON.stringify(opts.ctx));
 			var r = [];
-            var sz = opts.sz;
+            var sz = opts.ctx.engine.blksz;
             var raw = opts.data;
 			var left = raw.length;
 
@@ -144,10 +164,21 @@ var Proc = function(  ) {
 
 				console.log("ENGINE " + ctx.engine);
 
-				if ( ctx.engine === "shannon" ) { 
+				switch ( ctx.engine.type ) {
+					case  "shannon":
 					return cb(null, pluginShannon({"data":fns.normalize(r), "ctx":ctx}));
-				} else { 
+					break;
+					case  "filter" :
 					return cb(null, plugin({"data":r, "ctx":ctx}));
+					break;
+					case  "raw" :
+					return cb(null, pluginRaw({"data":r, "ctx":ctx}));
+					break;
+				}
+				if ( ctx.engine.type === "shannon" ) { 
+
+				} else  { 
+
 				}
 			});
 		}

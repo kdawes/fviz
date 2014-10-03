@@ -15,5 +15,8 @@
     "grunt-contrib-uglify": "~0.2.7",
     "node-static": "^0.7.5",
     "tape": "^2.14.0"
+  },
+  "dependencies": {
+    "director": "^1.2.3"
   }
 }

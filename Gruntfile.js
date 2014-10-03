@@ -9,7 +9,9 @@ module.exports = function(grunt) {
           src: ['bower_components/lodash/dist/lodash.js',
 				'bower_components/jquery/dist/jquery.js',
 				'js/highcharts/highcharts.js', 
-				'js/shannon.js'],
+				'js/shannon.js',
+        'node_modules/director/build/director.js'
+        ],
         dest: 'bundle.js',
       },
     },

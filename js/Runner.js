@@ -1,5 +1,5 @@
 module.exports = function() {
-	var Periodic = require('./Periodic');
+	var Periodic = require('Periodic');
 	console.log("Runner ");
 	var that = this;
 	that.state = {
