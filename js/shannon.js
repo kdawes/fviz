@@ -16,7 +16,7 @@ var Proc = function(  ) {
 		xhr.send();
 	}
 
-	var historize = function( bytes_data ) {
+	function historize( bytes_data ) {
 		var dd = 0;
 		var bb = {};
 		for ( i = 0; i < bytes_data.length; i ++ ) { 
@@ -30,10 +30,11 @@ var Proc = function(  ) {
 		return bb;
 	};
 
-	var log2 = function( x ) {
+	function log2( x ) {
 		return Math.log(x) / Math.log(2);
 	};
-	var plugin = function(opts) {
+
+	function pluginFilter(opts) {
         var ctx = opts.ctx;
 		var blocks = [];
 		var raw = opts.data;
@@ -43,7 +44,7 @@ var Proc = function(  ) {
 			var y = Math.floor(i * ctx.block.width / ctx.spanw);
 			var xx = (i * ctx.block.width) % ctx.spanw;
 			var yy = (y * ctx.block.height);
-//			if ( yy > 16384 ) { console.log("TOO BIG " + yy);}
+
 			if ( raw[i] === 0xff ) {
 				blocks.push({ "raw": raw[i], "rgba": { "r":255, "g":0, "b":0 , "a": 255 },
 							  "x": xx,
@@ -169,16 +170,11 @@ var Proc = function(  ) {
 					return cb(null, pluginShannon({"data":fns.normalize(r), "ctx":ctx}));
 					break;
 					case  "filter" :
-					return cb(null, plugin({"data":r, "ctx":ctx}));
+					return cb(null, pluginFilter({"data":r, "ctx":ctx}));
 					break;
 					case  "raw" :
 					return cb(null, pluginRaw({"data":r, "ctx":ctx}));
 					break;
-				}
-				if ( ctx.engine.type === "shannon" ) { 
-
-				} else  { 
-
 				}
 			});
 		}
