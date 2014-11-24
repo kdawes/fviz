@@ -1,5 +1,6 @@
-var Utils = function() {
+var work = require('webworkify');
 
+var Proc = function() {
   var state = {
     animInterval : 750,
     idleCount : 0,
@@ -53,7 +54,7 @@ var Utils = function() {
 
   var fns = {
     setupEngine: function() {
-      state.worker  = new Worker('js/shannon.js');    
+      state.worker  = work(require('./js/shannon.js'));//new Worker('js/shannon.js');    
       state.worker.onmessage = function( ev ) {
         console.log("ONMESSAGE WORKER ");
         if ( ev.data ) {
@@ -67,11 +68,13 @@ var Utils = function() {
           //If we are done receiving - start rendering
           console.log("Starting anim interval");
           render();
+          state.worker.terminate();
         }
       }
       return state;
     },
     go: function(opts) {
+      fns.setupEngine();
       var width = opts.width || 2;
       var height = opts.height || 2;
       state.w = opts.spanw;
@@ -80,19 +83,17 @@ var Utils = function() {
       state.bh = height;
       state.grid = opts.grid;
       state.engine = opts.engine;
+
       state.worker.postMessage({
         "engine":opts.engine, 
         "spanw":opts.spanw, 
         "spanh":opts.spanh, 
         "block": { "width":width, "height":height}
       });
+
     }
   };
-
-
-  fns.setupEngine();
 
   return fns;
 };
 
-exports = module.exports = Utils;

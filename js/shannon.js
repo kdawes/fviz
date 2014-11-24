@@ -1,10 +1,11 @@
-var Proc = function(  ) {
+//var msgpack = require('msgpack-js');
 
+function shannon() {
 	function getBytes(cb) {
 		console.log("getBytes");
 		var xhr = new XMLHttpRequest();
 
-		xhr.open('GET', '/test.png', true); 
+		xhr.open('GET', '/img', true); 
 		xhr.responseType = 'arraybuffer';
 		xhr.onload = function(e) {
 			console.log("XHR load");
@@ -48,7 +49,7 @@ var Proc = function(  ) {
 			if ( raw[i] === 0xff ) {
 				blocks.push({ "raw": raw[i], "rgba": { "r":255, "g":0, "b":0 , "a": 255 },
 							  "x": xx,
-							  "y":yy , "width" : ctx.block.width, "height":ctx.block.height});
+							  "y":yy });
 			} else if ( raw[i] === 0x0 ) {
 				blocks.push({ "raw": raw[i], "rgba": { "r":0, "g":255, "b":0, "a": 255},
 							  "x": xx,
@@ -80,7 +81,7 @@ var Proc = function(  ) {
 			var yy = (y * ctx.block.height);
 			blocks.push({ "raw": tmp[i],"rgba": { "r":tmp[i] * 1.095, "g":0, "b":0 , "a": tmp[i] << 1.75 },
 			            "x": xx,
-			            "y":yy });
+			            "y": yy });
         }
         return blocks;
     }
@@ -91,16 +92,20 @@ var Proc = function(  ) {
         var ctx = opts.ctx;
         var raw = opts.data;
         var c = 0;
-        for( i = 0; i < raw.length; i++, c+=4) {
-        	var y = Math.floor(i * ctx.block.width / ctx.spanw);
-			var xx = (i * ctx.block.width) % ctx.spanw;
-			var yy = (y * ctx.block.height);
-			blocks.push({ "raw": raw[i],"rgba": { "r":raw[i] , "g": raw[i], "b": raw[i] , "a": 255 },
-			            "x": xx,
-			            "y":yy });
-        }
-        return blocks;
-    }
+   //      for( i = 0; i < raw.length; i++, c+=4) {
+   //      	var y = Math.floor(i * ctx.block.width / ctx.spanw);
+			// var xx = (i * ctx.block.width) % ctx.spanw;
+			// var yy = (y * ctx.block.height);
+			// blocks.push({ "raw": raw[i],"rgba": { "r":raw[i] , "g": raw[i], "b": raw[i] , "a": 255 },
+			//             "x": xx,
+			//             "y":yy });
+   //      }
+   //      return blocks;
+         for ( i = 0; i < raw.length; i++ ){
+
+         }
+         return blocks;
+	}
 
 	//exported functions
 	var fns = { 
@@ -144,7 +149,7 @@ var Proc = function(  ) {
 				left -= n;
 				idx += n;
 				count ++;
-			} while ( left > 0);
+			} while ( left > 0 );
 			return r;
 		},
 
@@ -182,6 +187,8 @@ var Proc = function(  ) {
 
 	return fns;
 };
+
+
 // Onmessage for webworker support
 onmessage = function( oev ) { 
 	var LIMIT_DATA = 1000000;
@@ -189,7 +196,7 @@ onmessage = function( oev ) {
 	if ( oev.data ) {
 		console.log("TYPEOF " + oev.data);
 		console.log("Shannon worker onmessage handler : BLOCK "+ JSON.stringify(oev.data));
-		var p = new Proc();
+		var p = new shannon();
 		p.buildIt(oev.data, function( e, r ) {
 			if ( e ) {  console.log ("ERROR " +  e); return; }
 			console.log("Got bytes : " + r.length);
