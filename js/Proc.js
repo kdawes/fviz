@@ -1,4 +1,6 @@
+//var work = require('webworkify');
 var Proc = function() {
+
   var state = {
     animInterval : 750,
     idleCount : 0,
@@ -52,7 +54,9 @@ var Proc = function() {
 
   var fns = {
     setupEngine: function() {
-      state.worker  = new Worker('./shannon.js');
+//      var w = work(require('./worker.js'));
+     // state.worker = work(require('./shannon.js'));
+      state.worker  = new Worker('js/shannon.js');
       state.worker.onmessage = function( ev ) {
         console.log("ONMESSAGE WORKER ");
         if ( ev.data ) {
@@ -92,5 +96,10 @@ var Proc = function() {
     }
   };
 
+
+
+
   return fns;
 };
+
+exports = module.exports = Proc;

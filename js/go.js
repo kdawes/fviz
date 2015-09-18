@@ -1,24 +1,7 @@
-      var Proc = require('Proc');
-      var engine = new Proc();
-      var work = require('webworkify');
-
-      // var opts = { 
-      //   "interval":500, 
-      //   "count":32, 
-      //   "cb" : function(e,r) { 
-      //     console.log("cb!" + JSON.stringify(r)); 
-      //     $('#messages').html(JSON.stringify(r)); 
-      //   },
-      // }
-      // console.log("periodic");
-      // var Periodic = require('Periodic');
-      // console.log("Required periodic - instanceOf ? " + (Periodic instanceof Periodic));
-      // var p = new Periodic(opts);
-      // console.log("new Periodic() instanceof ? "+ ( p instanceof Periodic));
-      // var Runner = require('Runner');
-      // var r = new Runner();
-      // r.add(p);
-      // r.startall();
+      var Proc = require('./Proc');
+      var shannon = require('./shannon')
+      var engine = new Proc()
+      var director = require('director')
 
       var routes = {
         '/filter': filter,
@@ -29,14 +12,14 @@
       };
 
       var config = {
-        "engine": { 
-        }, 
-        "width":6, 
-        "height":6, 
-        "spanw":2048, 
-        "spanh":16384, 
+        "engine": {
+        },
+        "width":6,
+        "height":6,
+        "spanw":2048,
+        "spanh":16384,
         "grid":false
-      }; 
+      };
 
       function shannon() {
         console.log("SHannon route");
@@ -76,7 +59,6 @@
           });
         });
       }
-    
-      var router = Router(routes);
 
+       var router = new director.Router(routes)
       router.init();
