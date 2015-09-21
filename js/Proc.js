@@ -1,4 +1,3 @@
-
 var Proc = function() {
   var state = {
     animInterval : 750,
@@ -45,7 +44,6 @@ var Proc = function() {
       var h = ( state.grid && state.bh > 2) ? state.bh - 1 : state.bh
       var imgdata = fillblock(ctx, w, h,  block )
       ctx2.putImageData(imgdata, block.x, block.y)
-
     })
     console.log("drawing to sandbox")
     ctx.drawImage(tester, state.w, state.h)
@@ -92,9 +90,6 @@ var Proc = function() {
 
     }
   }
-
-
-
 
   return fns
 }

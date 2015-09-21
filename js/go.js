@@ -1,11 +1,10 @@
 var Proc = require('./Proc')
-var shannon = require('./shannon')
 var engine = new Proc()
 var director = require('director')
 
 var routes = {
   '/filter': filter,
-  '/shannon': shannon,
+  '/shannon': shannonRouteHandler,
   '/raw': raw,
   '/list': list,
   '/': list
@@ -14,17 +13,20 @@ var routes = {
 var config = {
   'engine': {
   },
-  'width': 16,
-  'height': 16,
+  'width': 6,
+  'height': 6,
   'spanw': 2048,
-  'spanh': 16384,
+  'spanh': 2048,
   'grid': false
 }
 
-function shannon () {
+function shannonRouteHandler () {
   console.log('SHannon route')
   var cfg = _.cloneDeep(config)
   cfg.engine.blksz = 20
+  cfg.width = 4
+  cfg.height = 4
+  cfg.grid = true
   cfg.engine.type = 'shannon'
   engine.go(cfg)
 }
@@ -33,8 +35,8 @@ function filter () {
   console.log('Filter route')
   var cfg = _.cloneDeep(config)
   cfg.engine.type = 'filter'
-  cfg.width = 16
-  cfg.height = 16
+  cfg.width = 6
+  cfg.height = 6
   cfg.grid = true
   engine.go(cfg)
 }

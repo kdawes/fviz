@@ -36,7 +36,7 @@ function Shannon () {
       var y = Math.floor(i * ctx.block.width / ctx.spanw)
       var xx = (i * ctx.block.width) % ctx.spanw
       var yy = (y * ctx.block.height)
-
+  
       if (raw[i] === 0xff) {
         blocks.push({
           'raw': raw[i],
@@ -67,6 +67,7 @@ function Shannon () {
         })
       }
     }
+
     return blocks
   }
 
@@ -84,7 +85,7 @@ function Shannon () {
           'r': tmp[i] * 1.095,
           'g': 0,
           'b': 0,
-          'a': tmp[i] << 1.75
+          'a': tmp[i] << 4
         },
         'x': xx,
         'y': yy
@@ -94,8 +95,26 @@ function Shannon () {
   }
 
   function pluginRaw (opts) {
+    var ctx = opts.ctx
     var blocks = []
+    var raw = opts.data
 
+    function clamp (v) {
+      return (v > 255 || v < 0) ? 255 : v
+    }
+
+    for (var i = 0; i < raw.length; i++) {
+      var y = Math.floor(i * ctx.block.width / ctx.spanw)
+      var xx = (i * ctx.block.width) % ctx.spanw
+      var yy = (y * ctx.block.height)
+      var r,g,b,a = 0
+      blocks.push({
+        'raw': raw[i],
+        'rgba': { 'r': 0, 'g': 0, 'b': raw[i], 'a': raw[i] },
+        'x': xx,
+        'y': yy
+      })
+    }
     return blocks
   }
 
@@ -187,6 +206,9 @@ function Shannon () {
 
   return fns
 }
+
+
+
 // Onmessage for webworker support
 onmessage = function (oev) {
   var LIMIT_DATA = 1000000
