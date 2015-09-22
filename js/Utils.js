@@ -1,11 +1,11 @@
-var log = console.log.bind(console,'DBG>')
+var log = console.log.bind(console, 'DBG>')
 function Utils() {
   if (!(this instanceof Utils)) {
     return new Utils()
   }
 }
 
-Utils.prototype.log2 = function(x) {
+Utils.prototype.log2 = function (x) {
   return Math.log(x) / Math.log(2)
 }
 
