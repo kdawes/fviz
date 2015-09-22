@@ -1,5 +1,8 @@
 var log = console.log.bind(console,'DBG>')
 var PluginEngine = require('./PluginEngine')
+var Utils = require('./Utils')
+var u = new Utils()
+
 function Proc() {
   var state = {
     engine: null,
@@ -41,31 +44,31 @@ function Proc() {
     ctx.drawImage(tester, state.w, state.h)
   }
 
-  function setupEngine (opts, cb) {
+  function setupEngine (opts) {
     state.engine = new PluginEngine()
-
     for( f in opts ) {
       if (!state.hasOwnProperty(f)) {
         state[f] = opts[f]
       }
     }
-    state.engine.run({
-        bw: opts.width || 6,
-        bh: opts.height || 6,
-        spanw: opts.spanw || 512,
-        grid: opts.grid || true,
-        engine: opts.engine || 'filter',
-    },  function(e,r) {
-      state.blocks = r
-      cb(null, r)
+    var blocks = state.engine.run({
+      bw: opts.width || 6,
+      bh: opts.height || 6,
+      spanw: opts.spanw || 512,
+      grid: opts.grid || true,
+      engine: opts.engine || 'filter',
+      data: state.data
     })
 
+    return blocks
   }
 
   return {
     run: function(opts) {
-      setupEngine(opts, function(e) {
-        if (e) throw new Error('ERROR ', e)
+      u.getBytes('/img', function(e,r) {
+        if (e) throw new Error('failed data fetch')
+        opts.data = r
+        state.blocks = setupEngine(opts)
         render()
       })
     }

@@ -9,11 +9,8 @@ function PluginEngine () {
     return new PluginEngine()
   }
   self = this
-  self.bytes = null
-  this.setBytes = function(bytes) {
-    self.bytes = bytes
-  }
-  this.run = function(opts, cb) {
+
+  this.run = function(opts) {
     self.plugin = (function (){
       if (opts.engine && opts.engine.type) {
         switch(opts.engine.type) {
@@ -32,119 +29,105 @@ function PluginEngine () {
         throw new Error('no engine or engine not supported')
       }
     })()
-    self.plugin(opts).run(cb)
+    return self.plugin(opts).run()
   }
 }
 
-function pluginFilter (opts, cb) {
+function pluginFilter (opts) {
   log('PLUGINFILTER', ' opts ', JSON.stringify(opts))
   var blocks = []
   return {
-    run: function(cb) {
-      u.getBytes('/img', function(e,r) {
-        if ( e ) throw new Error('pluginFilter ', e)
-        log('RUNNING')
-        var raw = r
-        var re = /[\x20-\x7E]/
-        for (var i = 0; i < raw.length; i++) {
-          var y = Math.floor(i * opts.bw / opts.spanw)
-          var xx = (i * opts.bw) % opts.spanw
-          var yy = (y * opts.bh)
-          //log('xx ', xx, ' yy ', yy, ' y ', y, ' i ', i, ' raw[i] ', raw[i])
-          if (raw[i] === 0xff) {
-            blocks.push({
-              'raw': raw[i],
-              'rgba': { 'r': 255, 'g': 0, 'b': 0, 'a': 255 },
-              'x': xx,
-              'y': yy
-            })
-          } else if (raw[i] === 0x0) {
-            blocks.push({
-              'raw': raw[i],
-              'rgba': { 'r': 0, 'g': 255, 'b': 0, 'a': 255 },
-              'x': xx,
-              'y': yy
-            })
-          } else if (re.test(raw[i])) {
-            blocks.push({
-              'raw': raw[i],
-              'rgba': { 'r': 0, 'g': 0, 'b': 255, 'a': 255 },
-              'x': xx,
-              'y': yy
-            })
-          } else {
-            blocks.push({
-              'raw': raw[i],
-              'rgba': { 'r': 255, 'g': 255, 'b': 255, 'a': 255 },
-              'x': xx,
-              'y': yy
-            })
-          }
+    run: function() {
+      log('RUNNING')
+      var raw = opts.data
+      var re = /[\x20-\x7E]/
+      for (var i = 0; i < raw.length; i++) {
+        var y = Math.floor(i * opts.bw / opts.spanw)
+        var xx = (i * opts.bw) % opts.spanw
+        var yy = (y * opts.bh)
+        //log('xx ', xx, ' yy ', yy, ' y ', y, ' i ', i, ' raw[i] ', raw[i])
+        if (raw[i] === 0xff) {
+          blocks.push({
+            'raw': raw[i],
+            'rgba': { 'r': 255, 'g': 0, 'b': 0, 'a': 255 },
+            'x': xx,
+            'y': yy
+          })
+        } else if (raw[i] === 0x0) {
+          blocks.push({
+            'raw': raw[i],
+            'rgba': { 'r': 0, 'g': 255, 'b': 0, 'a': 255 },
+            'x': xx,
+            'y': yy
+          })
+        } else if (re.test(raw[i])) {
+          blocks.push({
+            'raw': raw[i],
+            'rgba': { 'r': 0, 'g': 0, 'b': 255, 'a': 255 },
+            'x': xx,
+            'y': yy
+          })
+        } else {
+          blocks.push({
+            'raw': raw[i],
+            'rgba': { 'r': 255, 'g': 255, 'b': 255, 'a': 255 },
+            'x': xx,
+            'y': yy
+          })
         }
-        cb(null, blocks)
-      })
-
+      }
+      return blocks
     }
   }
 }
 // given opts of : ... XXX fixme
 // api : run()  -> return a [] of blocks
-function pluginShannon (opts, cb) {
+function pluginShannon (opts) {
   log('pluginShannon')
   return {
-    run: function(cb) {
-      u.getBytes('/img', function(e,r) {
-        if (e) { throw new Error(e) }
-        var blocks = []
-        opts.data = r
-        var tmp = chunked_shannon(opts)
-        for (var i = 0; i < tmp.length; i++) {
-          var y = Math.floor(i * opts.bw / opts.spanw)
-          var xx = (i * opts.bw) % opts.spanw
-          var yy = (y * opts.bh)
-          blocks.push({
-            'raw': tmp[i],
-            'rgba': {
-              'r': tmp[i] * 1.095,
-              'g': 0,
-              'b': 0,
-              'a': tmp[i] << 4
-            },
-            'x': xx,
-            'y': yy
-          })
-        }
-        cb(null,blocks)
-      })
+    run: function() {
+      var blocks = []
+      var tmp = chunked_shannon(opts)
+      for (var i = 0; i < tmp.length; i++) {
+        var y = Math.floor(i * opts.bw / opts.spanw)
+        var xx = (i * opts.bw) % opts.spanw
+        var yy = (y * opts.bh)
+        blocks.push({
+          'raw': tmp[i],
+          'rgba': {
+            'r': tmp[i] * 1.095,
+            'g': 0,
+            'b': 0,
+            'a': tmp[i] << 4
+          },
+          'x': xx,
+          'y': yy
+        })
+      }
+      return blocks
     }//run
   }//return
 }//pluginShannon
 
-function pluginRaw (opts, cb) {
+function pluginRaw (opts) {
   log('PLUGINRAW')
   return {
-    run: function(cb) {
-      u.getBytes('/img', function(e,r) {
-        var blocks = []
-        var raw = r
-        function clamp (v) {
-          return (v > 255 || v < 0) ? 255 : v
-        }
-
-        for (var i = 0; i < raw.length; i++) {
-          var y = Math.floor(i * opts.bw / opts.spanw)
-          var xx = (i * opts.bw) % opts.spanw
-          var yy = (y * opts.bh)
-          var r,g,b,a = 0
-          blocks.push({
-            'raw': raw[i],
-            'rgba': { 'r': 0, 'g': 0, 'b': raw[i], 'a': raw[i] },
-            'x': xx,
-            'y': yy
-          })
-        }
-        cb(null, blocks)
-      })
+    run: function() {
+      var blocks = []
+      var raw = opts.data
+      for (var i = 0; i < raw.length; i++) {
+        var y = Math.floor(i * opts.bw / opts.spanw)
+        var xx = (i * opts.bw) % opts.spanw
+        var yy = (y * opts.bh)
+        var r,g,b,a = 0
+        blocks.push({
+          'raw': raw[i],
+          'rgba': { 'r': 0, 'g': 0, 'b': raw[i], 'a': raw[i] },
+          'x': xx,
+          'y': yy
+        })
+      }
+      return blocks
     }
   }
 }

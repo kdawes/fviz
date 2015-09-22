@@ -34,10 +34,10 @@ Utils.prototype.getBytes = function (url, cb) {
   xhr.onload = function (e) {
     console.log('XHR load')
     var words = new Uint8Array(this.response)
-    console.log('WE GOT ' + words.length)
+    log('WE GOT ', words.length)
     cb(null, words)
   }
-  console.log('XHR SEND')
+  log('XHR SEND')
   xhr.send()
 }
 
