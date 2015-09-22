@@ -1,95 +1,44 @@
-function Proc () {
-  var state = {
-    animInterval: 750,
-    idleCount: 0,
-    rendered: 0,
-    worker: null,
-    blocks: [],
-    renderedList: [],
-    w: 0,
-    h: 0,
-    bw: 0,
-    bh: 0,
-    grid: false,
-    engine: null
+var log = console.log.bind(console,'DBG>')
+function Utils() {
+  if (!(this instanceof Utils)) {
+    return new Utils()
   }
-
-  var fillblock = function (context, w, h, blk) {
-    if (undefined === context) {
-      return
-    }
-    var b = context.createImageData(w, h)
-    // magic 4 because rgba - one byte for each
-    for (var x = 0; x < b.data.length; x += 4) {
-      b.data[x + 0] = blk.rgba.r
-      b.data[x + 1] = blk.rgba.g
-      b.data[x + 2] = blk.rgba.b
-      b.data[x + 3] = blk.rgba.a
-    }
-
-    return b
-  }
-
-  function render () {
-    console.log('render...' + state.blocks.length + ' ' + state.w + '  ' + state.h)
-    $('#messages').html('<h3><b>RENDERING</b></h3>')
-    var tester = document.createElement('canvas')
-    var ctx = tester.getContext('2d')
-    var c = document.getElementById('sandbox')
-    var ctx2 = c.getContext('2d')
-    ctx2.canvas.width = state.w
-    ctx2.canvas.height = state.h
-    console.log('BLOCK[0] ' + JSON.stringify(state.blocks[0]))
-    state.blocks.forEach(function (block) {
-      var w = (state.grid && state.bw > 2) ? state.bw - 1 : state.bw
-      var h = (state.grid && state.bh > 2) ? state.bh - 1 : state.bh
-      var imgdata = fillblock(ctx, w, h, block)
-      ctx2.putImageData(imgdata, block.x, block.y)
-    })
-    console.log('drawing to sandbox')
-    ctx.drawImage(tester, state.w, state.h)
-  }
-
-  var fns = {
-    setupEngine: function () {
-      state.worker = new Worker('./shannon.js')
-      state.worker.onmessage = function (ev) {
-        console.log('ONMESSAGE WORKER ')
-        if (ev.data) {
-          console.log('ev.data.length : ' + ev.data.length)
-          try {
-            state.blocks = JSON.parse(ev.data)
-          } catch (e) {
-            console.log('onmessage : ERROR parsing input' + JSON.stringify(e))
-          }
-        } else {
-          // If we are done receiving - start rendering
-          console.log('Starting anim interval')
-          render()
-          state.worker.terminate()
-        }
-      }
-      return state
-    },
-    go: function (opts) {
-      fns.setupEngine()
-      var width = opts.width || 2
-      var height = opts.height || 2
-      state.w = opts.spanw
-      state.h = opts.spanh
-      state.bw = width
-      state.bh = height
-      state.grid = opts.grid
-      state.engine = opts.engine
-
-      state.worker.postMessage({
-        'engine': opts.engine,
-        'spanw': opts.spanw,
-        'spanh': opts.spanh,
-        'block': { 'width': width, 'height': height }
-      })
-    }
-  }
-
-  return fns
 }
+
+Utils.prototype.log2 = function(x) {
+  return Math.log(x) / Math.log(2)
+}
+
+Utils.prototype.historize = function (bytes_data) {
+  var bb = {}
+  for (var i = 0; i < bytes_data.length; i++) {
+    bb[bytes_data[i]] = bb[bytes_data[i]]++ || 1
+  }
+  return bb
+}
+Utils.prototype.normalize = function (data) {
+  // x = x - xmin / xmax - xmin =>  ( ( x - 0 ) / 255 - 0) * 255
+  var n = new Uint8Array(data.length)
+  for (var i = 0; i < data.length; i++) {
+    n[i] = (data[i] - 1) / (255 - 1) * 255
+  }
+  return n
+}
+
+Utils.prototype.getBytes = function (url, cb) {
+  if (!url) throw new Error('getBytes(url,cb) - url is required')
+  log('getBytes', ' url ', url)
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', url, true)
+  xhr.responseType = 'arraybuffer'
+  xhr.onload = function (e) {
+    console.log('XHR load')
+    var words = new Uint8Array(this.response)
+    console.log('WE GOT ' + words.length)
+    cb(null, words)
+  }
+  console.log('XHR SEND')
+  xhr.send()
+}
+
+exports = module.exports = Utils

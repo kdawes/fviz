@@ -15,7 +15,7 @@ var config = {
   },
   'width': 6,
   'height': 6,
-  'spanw': 2048,
+  'spanw': 1024,
   'spanh': 2048,
   'grid': false
 }
@@ -23,12 +23,12 @@ var config = {
 function shannonRouteHandler () {
   console.log('SHannon route')
   var cfg = _.cloneDeep(config)
-  cfg.engine.blksz = 20
-  cfg.width = 4
-  cfg.height = 4
+  cfg.engine.blksz = 64
+  cfg.width = 6
+  cfg.height = 6
   cfg.grid = true
   cfg.engine.type = 'shannon'
-  engine.go(cfg)
+  engine.run(cfg)
 }
 
 function filter () {
@@ -38,7 +38,7 @@ function filter () {
   cfg.width = 6
   cfg.height = 6
   cfg.grid = true
-  engine.go(cfg)
+  engine.run(cfg)
 }
 
 function raw () {
@@ -46,7 +46,9 @@ function raw () {
   var cfg = _.cloneDeep(config)
   cfg.engine.type = 'raw'
   cfg.grid = true
-  engine.go(cfg)
+  cfg.width = 6
+  cfg.height = 6
+  engine.run(cfg)
 }
 
 function list () {
