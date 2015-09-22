@@ -16,7 +16,10 @@ function run (opts) {
     var y = Math.floor(i * opts.bw / opts.spanw)
     var xx = (i * opts.bw) % opts.spanw
     var yy = (y * opts.bh)
-
+    var r = 0
+    var g = 0
+    var b = 0
+    var a = 0
     if (raw[i] === 0xff) {
       blocks.push({
         'raw': raw[i],
