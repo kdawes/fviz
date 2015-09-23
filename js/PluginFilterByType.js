@@ -19,36 +19,25 @@ function run (opts) {
     var r = 0
     var g = 0
     var b = 0
-    var a = 0
+    var a = 255
     if (raw[i] === 0xff) {
-      blocks.push({
-        'raw': raw[i],
-        'rgba': { 'r': 255, 'g': 0, 'b': 0, 'a': 255 },
-        'x': xx,
-        'y': yy
-      })
+      r = 255
     } else if (raw[i] === 0x0) {
-      blocks.push({
-        'raw': raw[i],
-        'rgba': { 'r': 0, 'g': 255, 'b': 0, 'a': 255 },
-        'x': xx,
-        'y': yy
-      })
+      g = 255
     } else if (re.test(raw[i])) {
-      blocks.push({
-        'raw': raw[i],
-        'rgba': { 'r': 0, 'g': 0, 'b': 255, 'a': 255 },
-        'x': xx,
-        'y': yy
-      })
+      b = 255
     } else {
-      blocks.push({
-        'raw': raw[i],
-        'rgba': { 'r': 255, 'g': 255, 'b': 255, 'a': 255 },
-        'x': xx,
-        'y': yy
-      })
+      r = 255
+      g = 255
+      b = 255
+      a = 255
     }
+    blocks.push({
+      'raw': raw[i],
+      'rgba': { 'r': r, 'g': g, 'b': b, 'a': a },
+      'x': xx,
+      'y': yy
+    })
   }
   return blocks
 }

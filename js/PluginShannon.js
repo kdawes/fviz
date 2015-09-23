@@ -33,17 +33,10 @@ function run (opts) {
       'y': yy
     })
   }
-  //log('BLOCKS', JSON.stringify(blocks,null,1))
+
   return blocks
 }
 
-// //shannon: function (bytes) {
-// // var sums = 0
-// // Object.keys(bytes).forEach(function (k) {
-// //   var p = pct(k); sums += p * log2(p)
-// // })
-// // console.log('Shannon entropy ' + -1 * sums)
-// //},
 function chunked_shannon (opts) {
   log('ChunkedSHannon')
   var r = []
@@ -53,26 +46,22 @@ function chunked_shannon (opts) {
   var raw = opts.data
   var left = raw.length
   var idx = 0
-  var count = 0
   var chunk_size = (undefined === sz) ? 20 : sz
-  var hist = u.historize(raw)
-  var len = Object.keys(hist).length
+
   do {
     var sums = 0
     var n = (left >= chunk_size) ? chunk_size : left
     var chunk = raw.subarray(idx, idx + n)
+    var hist = u.historize(chunk)
+    var len = Object.keys(hist).length
     chunk.forEach(function (k) {
       var p = hist[k] / len
       sums += p * u.log2(p)
     })
-    //	console.log (count + ' : ' + -1 * sums)
-    var tt = Math.abs(-idx * sums)
-    var normalized = u.normalize([tt])[0]
+    var normalized = u.normalize(Math.abs(-idx * sums))[0]
     r.push(normalized)
-    left -= 1
     idx += 1
-    count++
-  } while (left > 0)
+  } while (--left > 0)
   return r
 }
 
