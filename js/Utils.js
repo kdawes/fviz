@@ -1,5 +1,6 @@
 var log = console.log.bind(console, 'DBG>')
-function Utils() {
+
+function Utils () {
   if (!(this instanceof Utils)) {
     return new Utils()
   }
@@ -12,7 +13,7 @@ Utils.prototype.log2 = function (x) {
 Utils.prototype.historize = function (bytes_data) {
   var bb = {}
   for (var i = 0; i < bytes_data.length; i++) {
-    bb[bytes_data[i]] = bb[bytes_data[i]]++ || 1
+    bb[bytes_data[i]] = ++bb[bytes_data[i]] || 1
   }
   return bb
 }

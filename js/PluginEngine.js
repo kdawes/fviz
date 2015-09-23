@@ -9,17 +9,19 @@ function PluginEngine () {
   var self = this
 
   this.run = function (opts) {
-    self.plugin = (function () {
+    self.plugin =
+    (function () {
+      var chosen = null
       if (opts.engine && opts.engine.type) {
         switch (opts.engine.type) {
           case 'raw':
-            return new PluginRaw()
+            chosen = new PluginRaw()
             break
           case 'filter':
-            return new PluginFilterByType()
+            chosen = new PluginFilterByType()
             break
           case 'shannon':
-            return new PluginShannon()
+            chosen = new PluginShannon()
             break
           default:
             throw new Error('unsupported plugin')
@@ -27,6 +29,7 @@ function PluginEngine () {
       } else {
         throw new Error('no engine or engine not supported')
       }
+      return chosen
     })()
     return self.plugin.run(opts)
   }
