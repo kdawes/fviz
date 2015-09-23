@@ -33,7 +33,7 @@ function run (opts) {
       'y': yy
     })
   }
-//  log('BLOCKS', JSON.stringify(blocks,null,1))
+  //log('BLOCKS', JSON.stringify(blocks,null,1))
   return blocks
 }
 
@@ -48,7 +48,7 @@ function chunked_shannon (opts) {
   log('ChunkedSHannon')
   var r = []
   // XXX fixme - should come from opts
-  var sz = 8
+  var sz = 32
 
   var raw = opts.data
   var left = raw.length
@@ -66,7 +66,9 @@ function chunked_shannon (opts) {
       sums += p * u.log2(p)
     })
     //	console.log (count + ' : ' + -1 * sums)
-    r.push(-idx * sums)
+    var tt = Math.abs(-idx * sums)
+    var normalized = u.normalize([tt])[0]
+    r.push(normalized)
     left -= 1
     idx += 1
     count++
