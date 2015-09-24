@@ -2,6 +2,10 @@ var log = console.log.bind(console, 'DBG>')
 var PluginEngine = require('./PluginEngine')
 var Utils = require('./Utils')
 var u = new Utils()
+var $ = require('jquery')
+
+var React = require('react')
+var Hello = require('./Hello')
 
 function Proc () {
   var state = {
@@ -23,13 +27,16 @@ function Proc () {
     return b
   }
 
-  function render () {
+  function renderIt () {
+        React.render(<Hello />, document.getElementById('messages'))
     log('render...len ', state.blocks.length, 'state.width ', state.width, 'state.height ', state.height)
-    $('#messages').html('<h3><b>RENDERING</b></h3>')
+  //  $('#messages').html('<h3><b>RENDERING</b></h3>')
     var tester = document.createElement('canvas')
     var ctx = tester.getContext('2d')
     var c = document.getElementById('sandbox')
     var ctx2 = c.getContext('2d')
+    var e = new Hello()
+
     ctx2.canvas.width = state.spanw
     ctx2.canvas.height = state.blocks.length * state.width / state.spanw * state.height
     log('BLOCK[0] ' + JSON.stringify(state.blocks[0]))
@@ -70,7 +77,7 @@ function Proc () {
         if (e) throw new Error('failed data fetch')
         opts.data = r
         state.blocks = setupEngine(opts)
-        render()
+        renderIt()
       })
     }
   }

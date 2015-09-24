@@ -58,7 +58,7 @@ function chunked_shannon (opts) {
       var p = hist[k] / len
       sums += p * u.log2(p)
     })
-    var normalized = u.normalize(Math.abs(-idx * sums))[0]
+    var normalized = u.normalize([Math.abs(-idx * sums)])[0]
     r.push(normalized)
     idx += 1
   } while (--left > 0)

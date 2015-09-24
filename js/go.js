@@ -1,3 +1,5 @@
+var $ = require('jquery')
+var _ = require('lodash')
 var Proc = require('./Proc')
 var engine = new Proc()
 var director = require('director')
