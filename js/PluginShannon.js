@@ -1,6 +1,8 @@
 var Util = require('./Utils') // my junk
 var u = new Util()
 var log = console.log.bind(console, 'DBG>')
+var React = require('react')
+var Chunk = require('./Chunk')
 
 function PluginShannon () {
   if (!(this instanceof PluginShannon)) {
@@ -21,19 +23,10 @@ function run (opts) {
     var y = Math.floor(i * opts.bw / opts.spanw)
     var xx = (i * opts.bw) % opts.spanw
     var yy = (y * opts.bh)
-    blocks.push({
-      'raw': tmp[i],
-      'rgba': {
-        'r': tmp[i],
-        'g': 0,
-        'b': 0,
-        'a': tmp[i]
-      },
-      'x': xx,
-      'y': yy
-    })
-  }
 
+    var rgba = { 'r': tmp[i], 'g': 0, 'b': 0, 'a': tmp[i] }
+    blocks.push(<Chunk  key={i} x={xx} y={yy} rgba={rgba} w={opts.bw} h={opts.bh}/>)
+  }
   return blocks
 }
 

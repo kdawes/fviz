@@ -1,3 +1,6 @@
+var React = require('react')
+var Chunk = require('./Chunk')
+
 function PluginRaw () {
   if (!(this instanceof PluginRaw)) {
     return new PluginRaw()
@@ -20,12 +23,10 @@ function run (opts) {
     var y = Math.floor(i * opts.bw / opts.spanw)
     var xx = (i * opts.bw) % opts.spanw
     var yy = (y * opts.bh)
-    blocks.push({
-      'raw': raw[i],
-      'rgba': { 'r': 0, 'g': 0, 'b': raw[i], 'a': raw[i] },
-      'x': xx,
-      'y': yy
-    })
+    var rgba = { 'r': 0, 'g': 0, 'b': raw[i], 'a': raw[i] }
+    blocks.push(<Chunk
+      key={i} x={xx} y={yy}
+      rgba={rgba} w={opts.bw} h={opts.bh}/>)
   }
   return blocks
 }
