@@ -2,9 +2,6 @@ var PluginEngine = require('./PluginEngine')
 var Utils = require('./Utils')
 var u = new Utils()
 
-var React = require('react')
-var Slate = require('./Slate')
-
 // Houses the PluginEngine
 // pluginEngine generates the shard / slate component
 function Dispatcher () {
@@ -33,14 +30,19 @@ function Dispatcher () {
 
   return {
     run: function (opts, cb) {
-      u.getBytes(opts.engine.dataUrl, function doIt (e, r) {
-        if (e) throw new Error('failed data fetch')
-        opts.data = r
+      if (! state.data) {
+        u.getBytes(opts.engine.dataUrl, function doIt (e, r) {
+          if (e) throw new Error('failed data fetch')
+          opts.data = r
+          state.blocks = setupEngine(opts)
+          cb(null, state)
+        })
+      } else {
         state.blocks = setupEngine(opts)
-        cb(null, <Slate data={state}/>)
-      })
+        cb(null, state)
+      }
+
     }
   }
 }
-
 exports = module.exports = Dispatcher

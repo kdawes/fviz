@@ -2,6 +2,7 @@ var director = require('director')
 var React = require('react')
 var Alert = require('react-bootstrap').Alert
 
+var Slate = require('./Slate')
 var NavPills = require('./NavPills')
 var Dispatcher = require('./Dispatcher')
 var engine = new Dispatcher()
@@ -29,7 +30,7 @@ var config = {
 function drawUi (config) {
   engine.run(config, function (e, data) {
     React.render(<NavPills router={router} routes={config.routes}/>, document.getElementById('routes'))
-    React.render(data, document.getElementById('messages'))
+    React.render(<Slate data={data}/>, document.getElementById('messages'))
   })
 }
 
