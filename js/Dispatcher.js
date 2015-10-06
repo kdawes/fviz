@@ -1,16 +1,13 @@
-
-
 var PluginEngine = require('./PluginEngine')
 var Utils = require('./Utils')
 var u = new Utils()
 
 var React = require('react')
-
 var Slate = require('./Slate')
 
 // Houses the PluginEngine
-// pluginEngine generates the shard / slate
-function Engine () {
+// pluginEngine generates the shard / slate component
+function Dispatcher () {
   var state = {
     engine: null,
     blocks: []
@@ -23,11 +20,11 @@ function Engine () {
       }
     }
     var blocks = state.engine.run({
-      bw: opts.width || 6,
-      bh: opts.height || 6,
-      spanw: opts.spanw || 512,
-      grid: opts.grid || true,
-      engine: opts.engine || 'filter',
+      bw: opts.width,
+      bh: opts.height,
+      spanw: opts.spanw,
+      grid: opts.grid,
+      engine: opts.engine,
       data: state.data
     })
 
@@ -36,7 +33,7 @@ function Engine () {
 
   return {
     run: function (opts, cb) {
-      u.getBytes('/img', function doIt(e, r) {
+      u.getBytes(opts.engine.dataUrl, function doIt (e, r) {
         if (e) throw new Error('failed data fetch')
         opts.data = r
         state.blocks = setupEngine(opts)
@@ -46,4 +43,4 @@ function Engine () {
   }
 }
 
-exports = module.exports = Engine
+exports = module.exports = Dispatcher
