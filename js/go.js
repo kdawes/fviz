@@ -1,84 +1,53 @@
-var $ = require('jquery')
 var director = require('director')
 var React = require('react')
-var Alert = require('react-bootstrap').Alert;
+var Alert = require('react-bootstrap').Alert
 
-var Engine = require('./Engine')
-var engine = new Engine()
-
+var NavPills = require('./NavPills')
+var Dispatcher = require('./Dispatcher')
+var engine = new Dispatcher()
+// need to require css or browserify doesn't pull in the bootstrap stuff
 var css = require('../css/app.css')
-console.log('CSS yo', css)
+// console.log('CSS yo', css)
 
 var routes = {
   '/filter': filter,
-  '/shannon': shannonRouteHandler,
-  '/raw': raw,
-  '/': listRoutes
+  '/shannon': shannon,
+  '/raw': raw
 }
 
 var config = {
   'engine': {
+    'dataUrl': '/img'
   },
-  'width': 	12,
-  'height': 12,
-  'spanw': 768,
-  'grid': true
+  'width': 16,
+  'height': 16,
+  'spanw': 1024, // should be a multiple of width
+  'grid': true,
+  'routes': Object.keys(routes)
 }
 
-var Url = React.createClass({
-  render : function () {
-    var joined = "/#" + this.props.url
-    return (<div><a href={joined} > {this.props.name}</a><br/></div>)
-  }
-})
-
-var UrlList = React.createClass({
-  render: function() {
-    var i = 0
-    var ul = this.props.urls.map(function(r) {
-      return <Url key={++i} name={r} url={r}/>
-    })
-    return (<div>{ul}</div>)
-  }
-})
-
-function shannonRouteHandler () {
-  var cfg = $.extend(true, {}, config);
-  cfg.engine.blksz = 64
-  cfg.engine.type = 'shannon'
-
-  engine.run(cfg, function(e, shard) {
-    React.render(<UrlList urls={Object.keys(routes)}/>, document.getElementById('routes'))
-    React.render(shard, document.getElementById('messages'))
+function drawUi (config) {
+  engine.run(config, function (e, data) {
+    React.render(<NavPills router={router} routes={config.routes}/>, document.getElementById('routes'))
+    React.render(data, document.getElementById('messages'))
   })
+}
+
+function shannon () {
+  config.engine.blksz = 64
+  config.engine.type = 'shannon'
+  drawUi(config)
 }
 
 function filter () {
-  var cfg = $.extend(true, {}, config);
-  cfg.engine.type = 'filter'
-
-  engine.run(cfg, function(e, shard) {
-    React.render(<Alert title='test'/>, document.getElementById('test'))
-    React.render(<UrlList urls={Object.keys(routes)}/>, document.getElementById('routes'))
-    React.render(shard, document.getElementById('messages'))
-  })
+  config.engine.type = 'filter'
+  drawUi(config)
 }
 
 function raw () {
-  var cfg = $.extend(true, {}, config);
-  cfg.engine.type = 'raw'
-
-  engine.run(cfg, function(e, shard) {
-    React.render(<UrlList urls={Object.keys(routes)}/>, document.getElementById('routes'))
-    React.render(shard, document.getElementById('messages'))
-  })
+  config.engine.type = 'raw'
+  drawUi(config)
 }
 
-function listRoutes() {
-  React.render(<UrlList urls={Object.keys(routes)}/>, document.getElementById('routes'))
-}
-
-//
-var router = new director.Router(routes)
+var router = new director.Router(routes).configure({notfound: filter})
 router.init()
-listRoutes()
