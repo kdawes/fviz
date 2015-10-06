@@ -8,13 +8,13 @@ Basically, this started as experiments with browser bundling / module options, ~
 * ~~grunt abandoned~~
 
 Notes : I have browserify / beefy in the path, which allows this to work
-+ $npm install && npm start
++ $ npm install && npm start
 
 # Live edits :
 $ beefy js/go.js:js/browserifybundle.js --live
 
 # Point browser to :
-http://localhost:9966/#/list
+http://localhost:9966/#/
 
 ## Eventually :
 + for bigger files, shard out the work across worker nodes and recombine
