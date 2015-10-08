@@ -1,5 +1,5 @@
 var React = require('react')
-var Chunk = require('./Chunk')
+var Chunk = require('./components/Chunk')
 var Utils = require('./Utils')
 var u = new Utils()
 function PluginRaw () {

@@ -2,18 +2,19 @@ var React = require('react')
 
 var Slate = React.createClass({
   render: function () {
-    var d = this.props.data
-    var calculatedHeight = Math.floor(d.blocks.length * d.width / d.spanw) * d.height
+    var d = this.props.blocks
+    var config = this.props.config
+    var calculatedHeight = Math.floor(d.length * config.width / config.spanw) * config.height
     // console.log('calculated height ' + calculatedHeight)
     return (
     <div>
       <span>
-      <h2 className={'text-muted'}> BW : {d.width} Data Size: {this.props.data.blocks.length} Span Width: {this.props.data.spanw}</h2>
+      <h2 className={'text-muted'}> BW : {config.width} Data Size: {d.length} Span Width: {config.spanw}</h2>
       </span>
       <div>
-      <svg width={this.props.data.spanw}
+      <svg width={config.spanw}
     height={calculatedHeight}>
-      {this.props.data.blocks}
+      {d}
       </svg>
       </div>
       </div>

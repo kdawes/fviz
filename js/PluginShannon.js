@@ -2,7 +2,7 @@ var Util = require('./Utils') // my junk
 var u = new Util()
 var log = console.log.bind(console, 'DBG>')
 var React = require('react')
-var Chunk = require('./Chunk')
+var Chunk = require('./components/Chunk')
 
 function PluginShannon () {
   if (!(this instanceof PluginShannon)) {
@@ -24,7 +24,7 @@ function run (opts) {
     var xx = (i * opts.bw) % opts.spanw
     var yy = (y * opts.bh)
 
-    var rgba = { 'r': tmp[i], 'g': 0, 'b': 0, 'a': tmp[i] }
+    var rgba = { 'r': tmp[i], 'g': 0, 'b': 0, 'a': tmp[i]}
     blocks.push(<Chunk  key={i} x={xx} y={yy} rgba={rgba} w={opts.bw} h={opts.bh}/>)
   }
   return blocks
@@ -55,7 +55,7 @@ function chunked_shannon (opts) {
     r.push(normalized)
     idx += 1
   } while (--left > 0)
-  return r
-}
+    return r
+  }
 
-exports = module.exports = PluginShannon
+  exports = module.exports = PluginShannon

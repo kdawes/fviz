@@ -1,6 +1,6 @@
 var log = console.log.bind(console, 'DBG>')
 var React = require('react')
-var Chunk = require('./Chunk')
+var Chunk = require('./components/Chunk')
 
 function PluginFilterByType () {
   if (!(this instanceof PluginFilterByType)) {
