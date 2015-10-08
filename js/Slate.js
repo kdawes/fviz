@@ -4,12 +4,9 @@ var Slate = React.createClass({
   render: function () {
     var d = this.props.data
     var calculatedHeight = Math.floor(d.blocks.length * d.width / d.spanw) * d.height
-    console.log('spanw' + d.spanw + ' bw ' + d.bw + ' length ' + d.blocks.length)
-    console.log('calculated height ' + calculatedHeight)
-
+    // console.log('calculated height ' + calculatedHeight)
     return (
-
-    <div class='container'>
+    <div>
       <span>
       <h2 className={'text-muted'}> BW : {d.width} Data Size: {this.props.data.blocks.length} Span Width: {this.props.data.spanw}</h2>
       </span>

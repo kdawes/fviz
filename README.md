@@ -13,6 +13,11 @@ Notes : I have browserify / beefy in the path, which allows this to work
 # Live edits :
 $ beefy js/go.js:js/browserifybundle.js --live
 
+# Debugging :
+Sometimes it's useful to run the browserify transforms by hand
+
+$ browserify -t browserify-css -t reactify  js/go.js
+
 # Point browser to :
 http://localhost:9966/#/
 
@@ -22,3 +27,4 @@ http://localhost:9966/#/
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
+Â

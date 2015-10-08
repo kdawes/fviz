@@ -10,6 +10,7 @@ function Dispatcher () {
     blocks: []
   }
   function setupEngine (opts) {
+    console.log('setupEngine ')
     state.engine = new PluginEngine()
     for (var f in opts) {
       if (!state.hasOwnProperty(f)) {
@@ -30,6 +31,7 @@ function Dispatcher () {
 
   return {
     run: function (opts, cb) {
+      console.log('running it!')
       if (! state.data) {
         u.getBytes(opts.engine.dataUrl, function doIt (e, r) {
           if (e) throw new Error('failed data fetch')

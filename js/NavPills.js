@@ -1,7 +1,7 @@
 var React = require('react')
 var Nav = require('react-bootstrap').Nav
 var NavItem = require('react-bootstrap').NavItem
-
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin
 // Render a set of bootstrap NavPill routes  :
 // (Route0)( Route1 )( Route2 )( Route3 )
 // required props : router ( instance of flatiron-Director )
@@ -11,6 +11,7 @@ var NavItem = require('react-bootstrap').NavItem
 // /route1
 // /route2 etc.
 var NavPillRoutes = React.createClass({
+  mixins: [PureRenderMixin],
   handleSelect: function (selectedKey) {
     this.setState({activeTab: selectedKey})
     this.props.router.setRoute(this.props.routes[selectedKey - 1])
@@ -25,7 +26,7 @@ var NavPillRoutes = React.createClass({
   render: function () {
     var i = 0
     var routeList = this.props.routes.map(function (r) {
-      return <NavItem  eventKey={++i} href={'/#' + r}>{r}</NavItem>
+      return <NavItem  eventKey={++i} key={i} href={'/#' + r}>{r}</NavItem>
     })
     var idx = this.getInitialState().activeTab
     return (
