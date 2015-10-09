@@ -1,7 +1,9 @@
+'use strict'
+
 var director = require('director')
 var React = require('react')
 var _ = require('lodash')
-var fd = require('../Dispatcher')
+var dispatcher = require('../Dispatcher')
 
 // need to require css or browserify doesn't pull in the bootstrap stuff
 var css = require('../../css/app.css')
@@ -65,28 +67,32 @@ var App = React.createClass({
   componentDidMount: function () {
     console.log('componentDidMount fired with state.config : ' + JSON.stringify(this.state.config.engine, null, 2))
     console.log('registering with the FluxDispatcher')
-
+    var that = this
     this.state.router.init()
     u.getBytes(this.state.config.engine.dataUrl, function doIt (e, r) {
       if (e) throw new Error('failed data fetch')
       this.setState({data: r})
     }.bind(this))
 
-    fd.dispatch({ 'actionType': 'dispatcher-online'})
+    dispatcher.register(function (d) {
+      if ( d.actionType === 'props-updated') {
+        console.log('got a fd action ' + JSON.stringify(d))
+        // XXX Fixme this needs an abstraction layer and
+        // sanitization
+        var cfgTmp = _.cloneDeep(that.state.config)
+        cfgTmp.width = d.newProps.width || cfgTmp.width
+        cfgTmp.height = d.newProps.height || cfgTmp.height
+        cfgTmp.spanw = d.newProps.spanw || cfgTmp.spanw
+        cfgTmp.grid = d.newProps.grid || cfgTmp.grid
 
-    fd.register(function (d) {
-      console.log('got a fd action ' + JSON.stringify(d))
-      // XXX Fixme this needs an abstraction layer and
-      // sanitization
-      var cfgTmp = _.cloneDeep(this.state.config)
-      cfgTmp.width = d.newProps.width || cfgTmp.width
-      cfgTmp.height = d.newProps.height || cfgTmp.height
-      cfgTmp.spanw = d.newProps.spanw || cfgTmp.spanw
-      cfgTmp.grid = d.newProps.grid || cfgTmp.grid
-
-      console.log('setting state.config : ' + JSON.stringify(cfgTmp, null, 2))
-      this.setState({'config': cfgTmp})
-    }.bind(this))
+        console.log('setting state.config : ' + JSON.stringify(cfgTmp, null, 2))
+        that.setState({'config': cfgTmp})
+      }
+    })
+    var intervalId = setInterval(function () {
+      dispatcher.dispatch({'actionType': 'dispatcher-online'})
+    }, 1000)
+    this.setState({ 'invtervalId': invtervalId})
   },
   shouldComponentUpdate: function () { console.log('shouldComponentUpdate fired'); return true; },
   // componentWillUpdate: function () { console.log('componentWillUpdate fired'); },
