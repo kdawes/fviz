@@ -1,7 +1,7 @@
+'use strict'
 var React = require('react')
 var Chunk = require('./components/Chunk')
-var Utils = require('./Utils')
-var u = new Utils()
+
 function PluginRaw () {
   if (!(this instanceof PluginRaw)) {
     return new PluginRaw()

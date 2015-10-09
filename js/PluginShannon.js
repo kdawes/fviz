@@ -1,5 +1,5 @@
-var Util = require('./Utils') // my junk
-var u = new Util()
+'use strict'
+var Utils = require('./Utils') // my junk
 var log = console.log.bind(console, 'DBG>')
 var React = require('react')
 var Chunk = require('./components/Chunk')
@@ -45,13 +45,13 @@ function chunked_shannon (opts) {
     var sums = 0
     var n = (left >= chunk_size) ? chunk_size : left
     var chunk = raw.subarray(idx, idx + n)
-    var hist = u.historize(chunk)
+    var hist = Utils.historize(chunk)
     var len = Object.keys(hist).length
     chunk.forEach(function (k) {
       var p = hist[k] / len
-      sums += p * u.log2(p)
+      sums += p * Utils.log2(p)
     })
-    var normalized = u.normalize([Math.abs(-idx * sums)])[0]
+    var normalized = Utils.normalize([Math.abs(-idx * sums)])[0]
     r.push(normalized)
     idx += 1
   } while (--left > 0)

@@ -1,6 +1,5 @@
 var PluginEngine = require('./PluginEngine')
 var Utils = require('./Utils')
-var u = new Utils()
 
 // Houses the PluginEngine
 // pluginEngine generates the shard / slate component

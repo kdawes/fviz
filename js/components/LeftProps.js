@@ -2,6 +2,7 @@
 var React = require('react')
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin
 var dispatcher = require('../Dispatcher')
+var ActionTypes = require('../enums/ActionTypes')
 
 var LeftProps = React.createClass({
   mixins: [PureRenderMixin],
@@ -14,11 +15,11 @@ var LeftProps = React.createClass({
   componentDidMount: function () {
     console.log('leftprops - componentDidMOunt')
     var that = this
-    let commsIntervalId = setInterval(function () {
+    var commsIntervalId = setInterval(function () {
       if (that.haveComms()) {
         console.log('leftprops - dispatching action')
-        dispatcher.dispatch({ 'actionType': 'props-updated',
-          'newProps': { 'width': 8, 'height': 8, 'spanw': 512, 'grid': true }
+        dispatcher.dispatch({ 'action': ActionTypes.props_updated,
+          'data': { 'width': 8, 'height': 8, 'spanw': 512, 'grid': true }
         })
         console.log('Clearning commsIntervalId')
         clearInterval(that.state.commsIntervalId)
@@ -29,7 +30,7 @@ var LeftProps = React.createClass({
     this.setState({'commsIntervalId': commsIntervalId})
 
     dispatcher.register(function (d) {
-      if (d.actionType && d.actionType === 'dispatcher-online') {
+      if (d.action && d.action === ActionTypes.dispatcher_online) {
         that.setState({'comms': true})
       } else {
         console.log('Unknown action from dispatcher' + JSON.stringify(d))

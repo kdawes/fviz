@@ -26,6 +26,21 @@ Utils.prototype.normalize = function (data) {
   return n
 }
 
+Utils.prototype.fillBlock = function (context, w, h, blk) {
+  if (undefined === context) {
+    throw new Error('null context in fillblock')
+  }
+  var b = context.createImageData(w, h)
+  // magic 4 because rgba - one byte for each
+  for (var x = 0; x < b.data.length; x += 4) {
+    b.data[x + 0] = blk.rgba.r
+    b.data[x + 1] = blk.rgba.g
+    b.data[x + 2] = blk.rgba.b
+    b.data[x + 3] = blk.rgba.a
+  }
+  return b
+}
+
 Utils.prototype.getBytes = function (url, cb) {
   if (!url) throw new Error('getBytes(url,cb) - url is required')
   log('getBytes', ' url ', url)
@@ -42,19 +57,4 @@ Utils.prototype.getBytes = function (url, cb) {
   xhr.send()
 }
 
-Utils.prototype.fillBlock = function (context, w, h, blk) {
-  if (undefined === context) {
-    throw new Error('null context in fillblock')
-  }
-  var b = context.createImageData(w, h)
-  // magic 4 because rgba - one byte for each
-  for (var x = 0; x < b.data.length; x += 4) {
-    b.data[x + 0] = blk.rgba.r
-    b.data[x + 1] = blk.rgba.g
-    b.data[x + 2] = blk.rgba.b
-    b.data[x + 3] = blk.rgba.a
-  }
-  return b
-}
-
-exports = module.exports = Utils
+exports = module.exports = new Utils()
