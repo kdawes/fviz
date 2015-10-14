@@ -1,6 +1,6 @@
 var PluginEngine = require('./PluginEngine')
 var Utils = require('./Utils')
-
+var _ = require('lodash')
 // Houses the PluginEngine
 // pluginEngine generates the shard / slate component
 function PluginDispatcher () {
@@ -16,6 +16,7 @@ function PluginDispatcher () {
         state[f] = opts[f]
       }
     }
+
     var blocks = state.engine.run({
       bw: opts.width,
       bh: opts.height,

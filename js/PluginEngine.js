@@ -3,7 +3,7 @@ var PluginShannon = require('./PluginShannon')
 var PluginFilterByType = require('./PluginFilterByType')
 
 function PluginEngine () {
-  if (!(this instanceof PluginEngine)) {
+	if (!(this instanceof PluginEngine)) {
     return new PluginEngine()
   }
   var self = this

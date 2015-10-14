@@ -2,14 +2,7 @@ var React = require('react')
 var Nav = require('react-bootstrap').Nav
 var NavItem = require('react-bootstrap').NavItem
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin
-// Render a set of bootstrap NavPill routes  :
-// (Route0)( Route1 )( Route2 )( Route3 )
-// required props : router ( instance of flatiron-Director )
-//                : routes : we need to be able to map to the routes
-// in the router.  This is an array[ 'route0','route1','route3'] =>
-// /route0
-// /route1
-// /route2 etc.
+
 var NavPillRoutes = React.createClass({
   mixins: [PureRenderMixin],
   handleSelect: function (selectedKey) {

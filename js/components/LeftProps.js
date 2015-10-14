@@ -1,46 +1,47 @@
 'use strict'
 var React = require('react')
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin
-var dispatcher = require('../Dispatcher')
+var dispatcher = require('../dispatcher/Dispatcher')
 var ActionTypes = require('../enums/ActionTypes')
+var FvizActions = require('../actions/FvizActions')
+var ConfigStore = require('../stores/ConfigStore')
+var Input = require('react-bootstrap').Input
 
 var LeftProps = React.createClass({
   mixins: [PureRenderMixin],
-  haveComms: function () {
-    return this.state.comms
-  },
   getInitialState: function () {
-    return { 'comms': false, 'commsIntervalId': null }
+    return { w: 16, h: 16, spanw: 1024, grid: true}
   },
-  componentDidMount: function () {
-    console.log('leftprops - componentDidMOunt')
-    var that = this
-    var commsIntervalId = setInterval(function () {
-      if (that.haveComms()) {
-        console.log('leftprops - dispatching action')
-        dispatcher.dispatch({ 'action': ActionTypes.props_updated,
-          'data': { 'width': 8, 'height': 8, 'spanw': 512, 'grid': true }
-        })
-        console.log('Clearning commsIntervalId')
-        clearInterval(that.state.commsIntervalId)
-      } else {
-        console.log('no comms : ' + that.state.commsIntervalId)
-      }
-    }, 1000)
-    this.setState({'commsIntervalId': commsIntervalId})
-
-    dispatcher.register(function (d) {
-      if (d.action && d.action === ActionTypes.dispatcher_online) {
-        that.setState({'comms': true})
-      } else {
-        console.log('Unknown action from dispatcher' + JSON.stringify(d))
-      }
+  handleSubmit: function (e) {
+    e.preventDefault()
+    FvizActions.updateProps({
+      'width': this.state.w,
+      'height': this.state.h,
+      'spanw': this.state.spanw,
+      'grid': true
     })
-
+  },
+  handleChangeWidth: function (event) {
+    this.setState({w: event.target.value})
+  },
+  handleChangeHeight: function (event) {
+    this.setState({h: event.target.value})
+  },
+  handleChangeSpanw: function (event) {
+    this.setState({spanw: event.target.value})
   },
   render: function () {
-    return (<h3>:D</h3>)
+    return (<div>
+    <form className="form-horizontal" onSubmit={this.handleSubmit}>
+        <Input type='text' label='Width' value={this.state.w} onChange={this.handleChangeWidth}/>
+        <Input type='text' label='Height' value={this.state.h} onChange={this.handleChangeHeight}/>
+        <Input type='text'  label='Span' value={this.state.spanw} onChange={this.handleChangeSpanw}/>
+      <input className='btn' type='submit' value='Update Props' />
+      </form>
+    </div>
+    )
   }
+
 })
 
 exports = module.exports = LeftProps
